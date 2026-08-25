@@ -8,6 +8,9 @@ GameWindow {
     screenWidth: 960
     screenHeight: 640
 
+	property int levelSize: 300
+	property int wallThickness: 10
+
     Scene {
         id: scene
         focus: true
@@ -26,16 +29,68 @@ GameWindow {
             gravity.y: 0
             updatesPerSecondForPhysics: 60
             velocityIterations: 5
-            positionIterations: 5
-            debugDrawVisible: false
-        }
+			positionIterations: 5
+			debugDrawVisible: true
+		}
 
+		Keys.forwardTo: player.controller
 
-        Keys.forwardTo: player.controller
+		EntityBase {
+			id: levelWalls
+			width: levelSize
+			height: levelSize
+			anchors.centerIn: scene
 
-        Player {
-            id: player
-            speed: 10
-        }
-    }
+			// Left
+			BoxCollider {
+				width: parent.width; height: wallThickness
+				bodyType: Body.Static
+			}
+			Rectangle {
+				width: parent.width; height: wallThickness
+				color: "blue"
+			}
+
+			// Down
+			BoxCollider {
+				y: levelSize - wallThickness
+				width: parent.width; height: wallThickness
+				bodyType: Body.Static
+			}
+			Rectangle {
+				y: levelSize - wallThickness
+				width: parent.width; height: wallThickness
+				color: "blue"
+			}
+
+			// Left
+			BoxCollider {
+				width: wallThickness; height: levelSize 
+				bodyType: Body.Static
+			}
+			Rectangle {
+				width: wallThickness; height: levelSize
+				color: "blue"
+			}
+
+			// Right
+			BoxCollider {
+				x: levelSize - wallThickness
+				width: wallThickness; height: levelSize
+				bodyType: Body.Static
+			}
+			Rectangle {
+				x: levelSize - wallThickness
+				width: wallThickness; height: levelSize
+				color: "blue"
+			}
+		}
+
+		Player {
+			id: player
+			speed: 10
+			x: levelWalls.x + levelSize / 2
+			y: levelWalls.y + levelSize / 4 * 3
+		}
+	}
 }
