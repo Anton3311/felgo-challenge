@@ -99,7 +99,10 @@ GameWindow {
 			entityCategory: Fixture.Category2
 			entityCollisionCategories: wallCategory | Fixture.Category2 | Fixture.Category4
 			bulletCategory: Fixture.Category4
-			bulletCollisionCategories: wallCategory | Fixture.Category2 | Fixture.Category3
+
+			// Don't include `entityCategory` (`Fixture.Category2`) in the collision mask, so that
+			// the player doesn't collide with its own bullets.
+			bulletCollisionCategories: wallCategory | Fixture.Category3
 		}
 
 		Team {
@@ -108,7 +111,11 @@ GameWindow {
 			entityCategory: Fixture.Category3
 			entityCollisionCategories: wallCategory | Fixture.Category3 | Fixture.Category4
 			bulletCategory: Fixture.Category4
-			bulletCollisionCategories: wallCategory | Fixture.Category2 | Fixture.Category3
+
+			// Don't include `Fixture.Category3` which is an `entityCategory`, to make sure that the
+			// bullets created by enemies, don't collide with other enemies, as well as, the one
+			// that created them
+			bulletCollisionCategories: wallCategory | Fixture.Category2
 		}
 
 		Player {
