@@ -21,6 +21,16 @@ GameWindow {
             entityContainer: level
         }
 
+        PhysicsWorld {
+            id: physicsWorld
+            gravity.y: 0
+            updatesPerSecondForPhysics: 60
+            velocityIterations: 5
+            positionIterations: 5
+            debugDrawVisible: false
+        }
+
+
         Keys.forwardTo: player.controller
 
         Player {
