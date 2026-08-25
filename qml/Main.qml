@@ -92,5 +92,25 @@ GameWindow {
 			x: levelWalls.x + levelSize / 2
 			y: levelWalls.y + levelSize / 4 * 3
 		}
+
+        EntityBase {
+            id: crossHair
+            Rectangle {
+                width: 5
+                height: 5
+                color: "white"
+            }
+        }
+
+		MouseArea {
+			id: mouseArea
+			enabled: true
+			anchors.fill: scene
+            hoverEnabled: true
+            onPositionChanged: (event) => {
+                crossHair.x = event.x - crossHair.width / 2;
+                crossHair.y = event.y - crossHair.height / 2;
+            }
+		}
 	}
 }
