@@ -129,11 +129,13 @@ GameWindow {
 
         EntityBase {
             id: crosshair
-            Rectangle {
-                width: 5
-                height: 5
-                color: "white"
-            }
+			Image {
+				smooth: false
+				anchors.centerIn: parent
+				source: Qt.resolvedUrl("../assets/entities/crosshair.png")
+				width: 16
+				height: 16
+			}
         }
 
 		BasicEnemy {
