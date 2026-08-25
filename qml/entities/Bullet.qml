@@ -35,7 +35,8 @@ EntityBase {
             destroy();
         }
 
-        MultiResolutionImage {
+        Image {
+			smooth: false
             anchors.centerIn: parent
             source: Qt.resolvedUrl("../../assets/entities/bullet.png")
             width: 16
