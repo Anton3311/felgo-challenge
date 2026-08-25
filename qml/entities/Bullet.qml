@@ -17,6 +17,7 @@ EntityBase {
         radius: bullet.radius
         bodyType: Body.Dynamic
         collidesWith: Box.Category2
+		groupIndex: -1 // make sure that bullets never collide with each other
         linearDamping: 0.1
         fixture.onBeginContact: (other, normal) => {
             let target = other.getBody().target;
