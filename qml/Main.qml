@@ -122,13 +122,13 @@ GameWindow {
 			id: player
 			team: playerTeam
 			speed: 10
-			crosshair: corsshair
+			crosshair: crosshair
 			x: levelWalls.x + levelSize / 2
 			y: levelWalls.y + levelSize / 4 * 3
 		}
 
         EntityBase {
-            id: corsshair
+            id: crosshair
             Rectangle {
                 width: 5
                 height: 5
@@ -149,8 +149,8 @@ GameWindow {
 			anchors.fill: scene
             hoverEnabled: true
             onPositionChanged: (event) => {
-                corsshair.x = event.x - corsshair.width / 2;
-                corsshair.y = event.y - corsshair.height / 2;
+                crosshair.x = event.x - crosshair.width / 2;
+                crosshair.y = event.y - crosshair.height / 2;
             }
 			onPressed: (event) => {
 				player.shoot();
