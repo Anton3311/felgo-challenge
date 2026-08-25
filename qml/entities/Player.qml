@@ -8,6 +8,7 @@ EntityBase {
 	entityType: "player"
 
 	property int speed
+	property EntityBase crosshair
 	property alias controller: axisController
 
 	property bool isMovingLeft
@@ -19,6 +20,7 @@ EntityBase {
 		id: collider
 		radius: 10
 		linearVelocity: Qt.point(axisController.xAxis * 20, axisController.yAxis * 20)
+		categories: Circle.Category1
 
 		Rectangle {
 			width: 20
@@ -94,5 +96,29 @@ EntityBase {
 			axisController.xAxis = dx * deltaScale;
 			axisController.yAxis = dy * deltaScale;
 		}
+	}
+
+	function shoot() {
+		let directionX = crosshair.x - player.x
+		let directionY = crosshair.y - player.y
+
+		let directionLength = Math.sqrt(directionX * directionX + directionY * directionY)
+		if (directionLength <= 0.0001) {
+			return;
+		}
+
+		directionX /= directionLength;
+		directionY /= directionLength;
+
+		let impulse = 500
+		directionX *= impulse;
+		directionY *= impulse;
+
+		let forceVector = Qt.point(directionX, directionY)
+
+		entityManager.createEntityFromUrlWithProperties(
+			Qt.resolvedUrl("Bullet.qml"),
+			{ "x": player.x, "y": player.y, "initialImpulse": forceVector }
+		);
 	}
 }

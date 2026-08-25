@@ -45,6 +45,7 @@ GameWindow {
 			BoxCollider {
 				width: parent.width; height: wallThickness
 				bodyType: Body.Static
+				categories: Box.Category1 | Box.Category2
 			}
 			Rectangle {
 				width: parent.width; height: wallThickness
@@ -56,6 +57,7 @@ GameWindow {
 				y: levelSize - wallThickness
 				width: parent.width; height: wallThickness
 				bodyType: Body.Static
+				categories: Box.Category1 | Box.Category2
 			}
 			Rectangle {
 				y: levelSize - wallThickness
@@ -67,6 +69,7 @@ GameWindow {
 			BoxCollider {
 				width: wallThickness; height: levelSize 
 				bodyType: Body.Static
+				categories: Box.Category1 | Box.Category2
 			}
 			Rectangle {
 				width: wallThickness; height: levelSize
@@ -78,6 +81,7 @@ GameWindow {
 				x: levelSize - wallThickness
 				width: wallThickness; height: levelSize
 				bodyType: Body.Static
+				categories: Box.Category1 | Box.Category2
 			}
 			Rectangle {
 				x: levelSize - wallThickness
@@ -89,12 +93,13 @@ GameWindow {
 		Player {
 			id: player
 			speed: 10
+			crosshair: corsshair
 			x: levelWalls.x + levelSize / 2
 			y: levelWalls.y + levelSize / 4 * 3
 		}
 
         EntityBase {
-            id: crossHair
+            id: corsshair
             Rectangle {
                 width: 5
                 height: 5
@@ -108,9 +113,12 @@ GameWindow {
 			anchors.fill: scene
             hoverEnabled: true
             onPositionChanged: (event) => {
-                crossHair.x = event.x - crossHair.width / 2;
-                crossHair.y = event.y - crossHair.height / 2;
+                corsshair.x = event.x - corsshair.width / 2;
+                corsshair.y = event.y - corsshair.height / 2;
             }
+			onPressed: (event) => {
+				player.shoot();
+			}
 		}
 	}
 }
