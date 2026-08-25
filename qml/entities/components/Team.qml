@@ -8,4 +8,9 @@ import Felgo
 
 Item {
     property string debugName
+
+	property int entityCategory
+	property int entityCollisionCategories;
+	property int bulletCategory
+	property int bulletCollisionCategories
 }

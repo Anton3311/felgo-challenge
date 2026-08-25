@@ -12,6 +12,8 @@ GameWindow {
 	property int levelSize: 300
 	property int wallThickness: 10
 
+	property int wallCategory: Fixture.Category1
+
     Scene {
         id: scene
         focus: true
@@ -46,7 +48,7 @@ GameWindow {
 			BoxCollider {
 				width: parent.width; height: wallThickness
 				bodyType: Body.Static
-				categories: Box.Category1 | Box.Category2
+				categories: wallCategory
 			}
 			Rectangle {
 				width: parent.width; height: wallThickness
@@ -58,7 +60,7 @@ GameWindow {
 				y: levelSize - wallThickness
 				width: parent.width; height: wallThickness
 				bodyType: Body.Static
-				categories: Box.Category1 | Box.Category2
+				categories: wallCategory
 			}
 			Rectangle {
 				y: levelSize - wallThickness
@@ -70,7 +72,7 @@ GameWindow {
 			BoxCollider {
 				width: wallThickness; height: levelSize 
 				bodyType: Body.Static
-				categories: Box.Category1 | Box.Category2
+				categories: wallCategory
 			}
 			Rectangle {
 				width: wallThickness; height: levelSize
@@ -82,7 +84,7 @@ GameWindow {
 				x: levelSize - wallThickness
 				width: wallThickness; height: levelSize
 				bodyType: Body.Static
-				categories: Box.Category1 | Box.Category2
+				categories: wallCategory
 			}
 			Rectangle {
 				x: levelSize - wallThickness
@@ -94,11 +96,19 @@ GameWindow {
 		Team {
 			id: playerTeam
 			debugName: "player"
+			entityCategory: Fixture.Category2
+			entityCollisionCategories: wallCategory | Fixture.Category2 | Fixture.Category4
+			bulletCategory: Fixture.Category4
+			bulletCollisionCategories: wallCategory | Fixture.Category2 | Fixture.Category3 | Fixture.Category4
 		}
 
 		Team {
 			id: enemyTeam
 			debugName: "enemies"
+			entityCategory: Fixture.Category3
+			entityCollisionCategories: wallCategory | Fixture.Category3 | Fixture.Category4
+			bulletCategory: Fixture.Category4
+			bulletCollisionCategories: wallCategory | Fixture.Category2 | Fixture.Category3 | Fixture.Category4
 		}
 
 		Player {

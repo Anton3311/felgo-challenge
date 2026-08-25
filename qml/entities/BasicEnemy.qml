@@ -47,7 +47,8 @@ EntityBase {
 
 	CircleCollider {
 		id: collider
-		categories: Circle.Category2
+		categories: team.entityCategory
+		collidesWith: team.entityCollisionCategories
 		radius: 10
 
 		Rectangle {

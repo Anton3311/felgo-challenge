@@ -19,17 +19,21 @@ EntityBase {
 	property bool isMovingUp
 	property bool isMovingDown
 
+	Component.onCompleted: {
+		damagable.team = team
+	}
+
 	Damagable {
 		id: myDamagable
 		maxHealth: 10
-		team: team
 	}
 
 	CircleCollider {
 		id: collider
 		radius: 10
 		linearVelocity: Qt.point(axisController.xAxis * 20, axisController.yAxis * 20)
-		categories: Circle.Category1
+		categories: team.entityCategory
+		collidesWith: team.entityCollisionCategories
 
 		Rectangle {
 			width: 20
