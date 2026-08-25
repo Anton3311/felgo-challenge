@@ -40,7 +40,7 @@ EntityBase {
 
 				let x = Math.cos(angle);
 				let y = Math.sin(angle);
-				bulletEmitter.emit(self.x + x, self.y + y, x, y, 200);
+				bulletEmitter.emit(self.x + x, self.y + y, x, y, 150);
 			}
 		}
 	}
@@ -49,13 +49,17 @@ EntityBase {
 		id: collider
 		categories: team.entityCategory
 		collidesWith: team.entityCollisionCategories
-		radius: 10
+		radius: 16
 		fixedRotation: true
+		linearDamping: 1
 
-		Rectangle {
-			width: 20
-			height: 20
-			color: "green"
+		Image {
+			anchors.centerIn: parent.anchors.center
+			smooth: false
+			source: Qt.resolvedUrl("../../assets/entities/ghost.png")
+			width: 32
+			height: 32
+			mirror: collider.linearVelocity.x < 0
 		}
 	}
 }

@@ -34,7 +34,7 @@ GameWindow {
             updatesPerSecondForPhysics: 60
             velocityIterations: 5
 			positionIterations: 5
-			debugDrawVisible: false
+			debugDrawVisible: true
 		}
 
 		Keys.forwardTo: player.controller
@@ -122,7 +122,7 @@ GameWindow {
 		Player {
 			id: player
 			team: playerTeam
-			speed: 200
+			speed: 150
 			crosshair: crosshair
 			x: levelWalls.x + levelSize / 2
 			y: levelWalls.y + levelSize / 4 * 3

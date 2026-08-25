@@ -31,16 +31,19 @@ EntityBase {
 
 	CircleCollider {
 		id: collider
-		radius: 10
+		radius: 16
 		linearVelocity: Qt.point(axisController.xAxis, axisController.yAxis)
 		categories: team.entityCategory
 		collidesWith: team.entityCollisionCategories
 		fixedRotation: true
 
-		Rectangle {
-			width: 20
-			height: 20
-			color: "red"
+		Image {
+			anchors.centerIn: parent.anchors.center
+			smooth: false
+			source: Qt.resolvedUrl("../../assets/entities/player.png")
+			width: 32
+			height: 32
+			mirror: collider.linearVelocity.x < 0
 		}
 	}
 
@@ -130,7 +133,7 @@ EntityBase {
 		directionX /= directionLength;
 		directionY /= directionLength;
 
-		let impulse = 200
+		let impulse = 150
 		bulletEmitter.emit(player.x, player.y, directionX, directionY, impulse);
 	}
 }
