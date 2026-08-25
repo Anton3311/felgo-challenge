@@ -30,7 +30,7 @@ GameWindow {
             updatesPerSecondForPhysics: 60
             velocityIterations: 5
 			positionIterations: 5
-			debugDrawVisible: true
+			debugDrawVisible: false
 		}
 
 		Keys.forwardTo: player.controller

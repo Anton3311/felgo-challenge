@@ -110,7 +110,7 @@ EntityBase {
 		directionX /= directionLength;
 		directionY /= directionLength;
 
-		let impulse = 500
+		let impulse = 200
 		directionX *= impulse;
 		directionY *= impulse;
 

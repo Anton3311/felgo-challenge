@@ -19,10 +19,11 @@ EntityBase {
             destroy();
         }
 
-        Rectangle {
-            width: bullet.radius * 2
-            height: bullet.radius * 2
-            color: "red"
+        MultiResolutionImage {
+            anchors.centerIn: parent
+            source: Qt.resolvedUrl("../../assets/entities/bullet.png")
+            width: 16
+            height: 16
         }
     }
 
