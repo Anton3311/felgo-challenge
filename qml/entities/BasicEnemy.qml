@@ -50,6 +50,7 @@ EntityBase {
 		categories: team.entityCategory
 		collidesWith: team.entityCollisionCategories
 		radius: 10
+		fixedRotation: true
 
 		Rectangle {
 			width: 20

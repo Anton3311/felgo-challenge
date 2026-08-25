@@ -35,6 +35,7 @@ EntityBase {
 		linearVelocity: Qt.point(axisController.xAxis * 20, axisController.yAxis * 20)
 		categories: team.entityCategory
 		collidesWith: team.entityCollisionCategories
+		fixedRotation: true
 
 		Rectangle {
 			width: 20
