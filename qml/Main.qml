@@ -99,7 +99,7 @@ GameWindow {
 			entityCategory: Fixture.Category2
 			entityCollisionCategories: wallCategory | Fixture.Category2 | Fixture.Category4
 			bulletCategory: Fixture.Category4
-			bulletCollisionCategories: wallCategory | Fixture.Category2 | Fixture.Category3 | Fixture.Category4
+			bulletCollisionCategories: wallCategory | Fixture.Category2 | Fixture.Category3
 		}
 
 		Team {
@@ -108,7 +108,7 @@ GameWindow {
 			entityCategory: Fixture.Category3
 			entityCollisionCategories: wallCategory | Fixture.Category3 | Fixture.Category4
 			bulletCategory: Fixture.Category4
-			bulletCollisionCategories: wallCategory | Fixture.Category2 | Fixture.Category3 | Fixture.Category4
+			bulletCollisionCategories: wallCategory | Fixture.Category2 | Fixture.Category3
 		}
 
 		Player {
