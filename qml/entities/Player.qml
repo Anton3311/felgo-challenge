@@ -21,6 +21,7 @@ EntityBase {
 
 	Component.onCompleted: {
 		damagable.team = team
+		bulletEmitter.team = team
 	}
 
 	Damagable {
@@ -58,6 +59,11 @@ EntityBase {
 			"left": Qt.Key_A,
 			"right": Qt.Key_D
 		}
+	}
+
+	BulletEmitter {
+		id: bulletEmitter
+		bulletPrefab: Qt.resolvedUrl("Bullet.qml")
 	}
 
 	// Sets the corresponding boolean state of the action `actionName` to `value`
@@ -124,14 +130,6 @@ EntityBase {
 		directionY /= directionLength;
 
 		let impulse = 200
-		directionX *= impulse;
-		directionY *= impulse;
-
-		let forceVector = Qt.point(directionX, directionY)
-
-		entityManager.createEntityFromUrlWithProperties(
-			Qt.resolvedUrl("Bullet.qml"),
-			{ "x": player.x, "y": player.y, "initialImpulse": forceVector, "team": player.team }
-		);
+		bulletEmitter.emit(player.x, player.y, directionX, directionY, impulse);
 	}
 }
