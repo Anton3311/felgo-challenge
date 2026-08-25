@@ -32,7 +32,7 @@ EntityBase {
 	CircleCollider {
 		id: collider
 		radius: 10
-		linearVelocity: Qt.point(axisController.xAxis * 20, axisController.yAxis * 20)
+		linearVelocity: Qt.point(axisController.xAxis, axisController.yAxis)
 		categories: team.entityCategory
 		collidesWith: team.entityCollisionCategories
 		fixedRotation: true

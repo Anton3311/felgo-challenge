@@ -121,7 +121,7 @@ GameWindow {
 		Player {
 			id: player
 			team: playerTeam
-			speed: 10
+			speed: 200
 			crosshair: crosshair
 			x: levelWalls.x + levelSize / 2
 			y: levelWalls.y + levelSize / 4 * 3
