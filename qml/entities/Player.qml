@@ -8,6 +8,7 @@ EntityBase {
 	entityId: "entity"
 	entityType: "player"
 
+	property Team team
 	property int speed
 	property EntityBase crosshair
 	property alias controller: axisController
@@ -21,6 +22,7 @@ EntityBase {
 	Damagable {
 		id: myDamagable
 		maxHealth: 10
+		team: team
 	}
 
 	CircleCollider {
@@ -125,7 +127,7 @@ EntityBase {
 
 		entityManager.createEntityFromUrlWithProperties(
 			Qt.resolvedUrl("Bullet.qml"),
-			{ "x": player.x, "y": player.y, "initialImpulse": forceVector }
+			{ "x": player.x, "y": player.y, "initialImpulse": forceVector, "team": player.team }
 		);
 	}
 }

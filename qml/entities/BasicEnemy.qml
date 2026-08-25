@@ -8,9 +8,15 @@ EntityBase {
 	entityType: "customEntity"
 
 	property alias damagable: myDamagable
+	property Team team
+
+	Component.onCompleted: {
+		damagable.team = team
+	}
 
 	Damagable {
 		id: myDamagable
+		team: team
 		maxHealth: 10
 		onDeath: {
 			self.destroy();

@@ -1,6 +1,8 @@
 import QtQuick
 import Felgo
 
+import "./components"
+
 EntityBase {
     id: bullet
     entityId: "entity"
@@ -8,6 +10,7 @@ EntityBase {
 
     property int radius: 4
     property point initialImpulse: Qt.point(0, 0)
+    property Team team
 
     CircleCollider {
         id: collider
@@ -17,8 +20,14 @@ EntityBase {
         linearDamping: 0.1
         fixture.onBeginContact: (other, normal) => {
             let target = other.getBody().target;
-            if (target.damagable !== undefined) {
-                target.damagable.applyDamage(1);
+            let damagable = target.damagable;
+            if (damagable !== undefined) {
+                if (damagable.team === bullet.team) {
+                    // Completely ignore. Don't apply damage, don't self destruct
+                    return;
+                }
+
+                damagable.applyDamage(1);
             }
 
             destroy();

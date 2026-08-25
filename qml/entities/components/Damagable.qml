@@ -6,6 +6,7 @@ import Felgo
 // Can be shared by both the player and the enemies
 
 Item {
+    property Team team
     property int health
     property int maxHealth
 

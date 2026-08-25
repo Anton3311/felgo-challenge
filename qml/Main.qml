@@ -1,6 +1,7 @@
 import Felgo 4.0
 import QtQuick 2.0
 import "./entities"
+import "./entities/components"
 
 GameWindow {
     id: gameWindow
@@ -90,8 +91,19 @@ GameWindow {
 			}
 		}
 
+		Team {
+			id: playerTeam
+			debugName: "player"
+		}
+
+		Team {
+			id: enemyTeam
+			debugName: "enemies"
+		}
+
 		Player {
 			id: player
+			team: playerTeam
 			speed: 10
 			crosshair: corsshair
 			x: levelWalls.x + levelSize / 2
@@ -109,6 +121,7 @@ GameWindow {
 
 		BasicEnemy {
 			id: enemy
+			team: enemyTeam
 			x: levelWalls.x + levelSize * 0.2
 			y: levelWalls.y + levelSize * 0.4
 		}
