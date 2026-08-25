@@ -22,6 +22,7 @@ EntityBase {
 	Component.onCompleted: {
 		damagable.team = team
 		bulletEmitter.team = team
+		bulletEmitter.emissionOrigin = player
 	}
 
 	Damagable {
@@ -134,6 +135,6 @@ EntityBase {
 		directionY /= directionLength;
 
 		let impulse = 150
-		bulletEmitter.emit(player.x, player.y, directionX, directionY, impulse);
+		bulletEmitter.emit(0, 0, directionX, directionY, impulse);
 	}
 }

@@ -44,6 +44,7 @@ EntityBase {
 
 	BulletEmitter {
 		id: bulletEmitter
+		emissionOrigin: self
 		bulletPrefab: Qt.resolvedUrl("./Bullet.qml")
 	}
 
@@ -123,7 +124,7 @@ EntityBase {
 
 				let x = Math.cos(angle);
 				let y = Math.sin(angle);
-				bulletEmitter.emit(self.x + x, self.y + y, x, y, 150);
+				bulletEmitter.enqueueForEmittion(0, 0, x, y, 150);
 			}
 		}
 	}
@@ -136,7 +137,10 @@ EntityBase {
 
 			let x = Math.cos(angle);
 			let y = Math.sin(angle);
-			bulletEmitter.emit(self.x + x, self.y + y, x, y, 150);
+
+			// Emit immediately, since the entity won't live long enough. Since `BulletEmitter`
+			// uses a timer to dequeue requests one by one.
+			bulletEmitter.emit(0, 0, x, y, 150);
 		}
 	}
 
