@@ -142,6 +142,7 @@ GameWindow {
 		BasicEnemy {
 			id: enemy
 			team: enemyTeam
+			target: player
 			x: levelWalls.x + levelSize * 0.2
 			y: levelWalls.y + levelSize * 0.4
 		}

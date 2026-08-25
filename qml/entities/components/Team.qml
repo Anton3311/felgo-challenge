@@ -9,8 +9,11 @@ import Felgo
 Item {
     property string debugName
 
+	// The category for entities of this team.
 	property int entityCategory
-	property int entityCollisionCategories;
+	// Categories of entities members of this team are allowed to collide with.
+	property int entityCollisionCategories
+
 	property int bulletCategory
 	property int bulletCollisionCategories
 }
