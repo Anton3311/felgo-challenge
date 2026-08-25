@@ -2,6 +2,7 @@ import Felgo 4.0
 import QtQuick 2.0
 import "./entities"
 import "./entities/components"
+import "./ui"
 
 GameWindow {
     id: gameWindow
@@ -24,8 +25,8 @@ GameWindow {
 
         EntityManager {
             id: entityManager
-            entityContainer: level
-        }
+			entityContainer: level
+		}
 
         PhysicsWorld {
             id: physicsWorld
@@ -169,6 +170,12 @@ GameWindow {
 				text: player.damagable.health
 				color: "white"
 			}
+		}
+
+		PlayerHealthBar {
+			damagable: player.damagable
+			fullHeartImage: Qt.resolvedUrl("../assets/entities/heartFull.png")
+			emptyHeartImage: Qt.resolvedUrl("../assets/entities/heartEmpty.png")
 		}
 	}
 }
