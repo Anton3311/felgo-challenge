@@ -107,6 +107,12 @@ GameWindow {
             }
         }
 
+		BasicEnemy {
+			id: enemy
+			x: levelWalls.x + levelSize * 0.2
+			y: levelWalls.y + levelSize * 0.4
+		}
+
 		MouseArea {
 			id: mouseArea
 			enabled: true
@@ -118,6 +124,18 @@ GameWindow {
             }
 			onPressed: (event) => {
 				player.shoot();
+			}
+		}
+
+		Item {
+			id: playerHealthDisplay
+			x: 0
+			y: 50
+			width: 100
+			height: 20
+			Text {
+				text: player.damagable.health
+				color: "white"
 			}
 		}
 	}

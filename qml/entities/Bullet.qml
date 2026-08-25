@@ -15,7 +15,12 @@ EntityBase {
         bodyType: Body.Dynamic
         collidesWith: Box.Category2
         linearDamping: 0.1
-        fixture.onBeginContact: {
+        fixture.onBeginContact: (other, normal) => {
+            let target = other.getBody().target;
+            if (target.damagable !== undefined) {
+                target.damagable.applyDamage(1);
+            }
+
             destroy();
         }
 

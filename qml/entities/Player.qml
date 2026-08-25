@@ -1,5 +1,6 @@
 import QtQuick
 import Felgo
+import "./components"
 
 EntityBase {
 	id: player
@@ -10,11 +11,17 @@ EntityBase {
 	property int speed
 	property EntityBase crosshair
 	property alias controller: axisController
+	property alias damagable: myDamagable
 
 	property bool isMovingLeft
 	property bool isMovingRight
 	property bool isMovingUp
 	property bool isMovingDown
+
+	Damagable {
+		id: myDamagable
+		maxHealth: 10
+	}
 
 	CircleCollider {
 		id: collider
