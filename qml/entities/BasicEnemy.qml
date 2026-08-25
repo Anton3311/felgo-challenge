@@ -37,6 +37,7 @@ EntityBase {
 		id: myDamagable
 		maxHealth: 10
 		onDeath: {
+			emitBulletsOnDeath()
 			self.destroy();
 		}
 	}
@@ -87,12 +88,17 @@ EntityBase {
 					dx /= distanceToTarget;
 					dy /= distanceToTarget;
 
-					collider.linearVelocity = Qt.point(dx * 200, dy * 200);
+					collider.linearVelocity = Qt.point(dx * 80, dy * 80);
 				}
 
 				break;
 			}
 		}
+	}
+
+	function randomInRange(min, max) {
+		let value = Math.random();
+		return min + value * (max - min)
 	}
 
 	Timer {
@@ -101,15 +107,36 @@ EntityBase {
 		repeat: true
 		running: false
 		onTriggered: {
+			if (target === null) {
+				return;
+			}
+
+			let dx = target.x - self.x
+			let dy = target.y - self.y
+			let angleTowardsTarget = Math.atan2(dy, dx)
+
+			let spread = Math.PI / 6;
 			let count = 6;
-			let angleStep = 2 * Math.PI / count;
 			for (let i = 0; i < count; i += 1) {
-				let angle = angleStep * i;
+				let spreadAngle = randomInRange(-spread / 2, spread / 2)
+				let angle = angleTowardsTarget + spreadAngle
 
 				let x = Math.cos(angle);
 				let y = Math.sin(angle);
 				bulletEmitter.emit(self.x + x, self.y + y, x, y, 150);
 			}
+		}
+	}
+
+	function emitBulletsOnDeath() {
+		let count = 12;
+		let angleStep = 2 * Math.PI / count
+		for (let i = 0; i < count; i += 1) {
+			let angle = angleStep * i;
+
+			let x = Math.cos(angle);
+			let y = Math.sin(angle);
+			bulletEmitter.emit(self.x + x, self.y + y, x, y, 150);
 		}
 	}
 
