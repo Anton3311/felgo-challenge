@@ -147,8 +147,8 @@ GameWindow {
 			]
 			initialDelay: 6000
 			inBetweenWavesDelay: 5000
-			spawnAreaMin: Qt.point(levelWalls.x, levelWalls.y)
-			spawnAreaMax: Qt.point(levelWalls.x + levelSize, levelWalls.y + levelSize)
+			spawnAreaMin: Qt.point(levelWalls.x + levelSize * 0.5 + 48, levelWalls.y - levelSize * 0.5 + 48)
+			spawnAreaMax: Qt.point(levelWalls.x + levelSize * 0.5 - 48, levelWalls.y + levelSize * 0.5 - 48)
 		}
 
 		MouseArea {
