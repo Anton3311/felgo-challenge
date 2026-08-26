@@ -18,7 +18,9 @@ EntityBase {
 	// How long to wait before starting the next wave
 	property int inBetweenWavesDelay
 
-	// Current number of enemies in the level
+	// Current number of enemies in the level.
+	//
+	// When this count reches 0, the next wave starts.
 	property int currentEnemyCount
 
 	// The bounding box of the spawn area
@@ -41,7 +43,7 @@ EntityBase {
 			name: "waitBeforeNext"
 			StateChangeScript {
 				script: {
-					inBetweenWavesDelayTimer.start();
+					inBetweenWavesDelayTimer.restart();
 				}
 			}
 		},
@@ -77,6 +79,12 @@ EntityBase {
 
 	// Prepares the next wave by placing spawn markers randomly around the level
 	function prepareNextWave() {
+		if (self.currentEnemyCount != 0) {
+			throw "Can't start a wave before the current one has finished"
+		}
+
+		console.debug("prepareNextWave");
+
 		let waveTypeIndex = Math.floor(Math.random() * self.waveTypes.length)
 
 		for (let enemyType of self.waveTypes[waveTypeIndex]) {
@@ -90,7 +98,8 @@ EntityBase {
 					"y": spawnPositionY,
 					"enemyPrefab": enemyType,
 					"enemyTeam": self.enemyTeam,
-					"player": self.player
+					"player": self.player,
+					"waveManager": self,
 				}
 			);
 
@@ -98,16 +107,32 @@ EntityBase {
 			self.markers.push(marker);
 		}
 
+		self.currentEnemyCount = self.markers.length
+
 		state = "waitBeforeNext"
 	}
 
 	// Actually spawns the enemies, at placed spawn markers
 	function beginNextWave() {
+		console.debug("beginNextWave");
+
 		for (let marker of self.markers) {
 			marker.spawn();
 		}
 
 		self.markers.length = 0;
 		state = "waitForCompletion"
+	}
+
+	function reportEnemyGotKilled() {
+		if (self.currentEnemyCount == 0) {
+			throw "`reportEnemyGotKilled` was called more times than there were enemies in the level";
+		}
+
+		self.currentEnemyCount -= 1
+		if (self.currentEnemyCount == 0) {
+			// The player has killed all the enemies, prepare the next wave.
+			self.prepareNextWave();
+		}
 	}
 }

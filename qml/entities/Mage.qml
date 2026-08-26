@@ -14,6 +14,9 @@ EntityBase {
 	property EntityBase target
 	property int attackRange: 220
 
+	// The `WaveManager` in order to report whenevere this enemy gets killed
+	property WaveManager waveManager
+
 	Component.onCompleted: {
 		bulletEmitter.team = team
 		damagable.team = team
@@ -23,6 +26,7 @@ EntityBase {
 		id: myDamagable
 		maxHealth: 10
 		onDeath: {
+			waveManager.reportEnemyGotKilled();
 			self.destroy();
 		}
 	}

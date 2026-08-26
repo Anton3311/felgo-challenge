@@ -14,6 +14,9 @@ EntityBase {
 	property EntityBase target
 	property int attackRange: 220
 
+	// The `WaveManager` in order to report whenevere this enemy gets killed
+	property WaveManager waveManager
+
 	state: "follow"
 	states: [
 		State {
@@ -35,7 +38,8 @@ EntityBase {
 		id: myDamagable
 		maxHealth: 10
 		onDeath: {
-			emitBulletsOnDeath()
+			emitBulletsOnDeath();
+			waveManager.reportEnemyGotKilled();
 			self.destroy();
 		}
 	}

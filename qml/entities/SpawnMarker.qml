@@ -11,12 +11,17 @@ EntityBase {
 	property Team enemyTeam
 	property EntityBase player
 
+	// `WaveManager` is further passed to the spawned enemy, so that it can report whenever it gets
+	// killed by the player.
+	property WaveManager waveManager
+
 	function spawn() {
 		entityManager.createEntityFromUrlWithProperties(marker.enemyPrefab, {
 			"x": marker.x,
 			"y": marker.y,
 			"target": marker.player,
-			"team": marker.enemyTeam
+			"team": marker.enemyTeam,
+			"waveManager": waveManager
 		});
 
 		marker.destroy();
