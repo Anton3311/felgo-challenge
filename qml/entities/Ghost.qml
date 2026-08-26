@@ -36,7 +36,7 @@ EntityBase {
 
 	Damagable {
 		id: myDamagable
-		maxHealth: 10
+		maxHealth: 4
 		onDeath: {
 			emitBulletsOnDeath();
 			waveManager.reportEnemyGotKilled();

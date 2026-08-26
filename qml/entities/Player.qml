@@ -28,7 +28,7 @@ EntityBase {
 
 	Damagable {
 		id: myDamagable
-		maxHealth: 10
+		maxHealth: 6
 	}
 
 	CircleCollider {
