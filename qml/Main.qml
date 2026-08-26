@@ -16,6 +16,8 @@ GameWindow {
 
 	property int wallCategory: Fixture.Category1
 
+	property int backgroundZOrder: -100
+
     Scene {
         id: scene
         focus: true
@@ -39,14 +41,21 @@ GameWindow {
             updatesPerSecondForPhysics: 60
             velocityIterations: 5
 			positionIterations: 5
-			debugDrawVisible: true
+			debugDrawVisible: false
 		}
 
 		Keys.forwardTo: player.controller
 
+		// Fill the whole screen with a solid color matching the borders of the background sprite
+		Rectangle {
+			z: backgroundZOrder
+			anchors.fill: scene
+			color: "#763b36"
+		}
+
 		EntityBase {
 			// Display the level background below everything
-			z: -100
+			z: backgroundZOrder
 			id: levelWalls
 			width: levelSize
 			height: levelSize
@@ -84,8 +93,8 @@ GameWindow {
 
 			Image {
 				smooth: false
-				width: 176 * 2
-				height: 176 * 2
+				width: levelSize
+				height: levelSize
 				source: Qt.resolvedUrl("../assets/entities/levelBackground.png")
 			}
 		}
