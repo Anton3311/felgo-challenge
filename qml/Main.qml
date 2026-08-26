@@ -148,6 +148,7 @@ GameWindow {
 
 		Mage {
 			team: enemyTeam
+			target: player
 			x: levelWalls.x + levelSize * 0.7
 			y: levelWalls.y + levelSize * 0.2
 		}

@@ -10,10 +10,8 @@ EntityBase {
 	property alias damagable: myDamagable
 	property Team team
 
-	// The current target entity, this enemy will try to attack.
-	//
-	// Well, it can only be the player or null.
-	property EntityBase target: null
+	// The target entity, this enemy will try to attack.
+	property EntityBase target
 	property int attackRange: 220
 
 	state: "follow"
