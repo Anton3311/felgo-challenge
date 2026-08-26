@@ -161,18 +161,6 @@ GameWindow {
 			}
 		}
 
-		Item {
-			id: playerHealthDisplay
-			x: 0
-			y: 50
-			width: 100
-			height: 20
-			Text {
-				text: player.damagable.health
-				color: "white"
-			}
-		}
-
 		PlayerHealthBar {
 			damagable: player.damagable
 			fullHeartImage: Qt.resolvedUrl("../assets/entities/heartFull.png")
