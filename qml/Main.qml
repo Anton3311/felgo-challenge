@@ -139,18 +139,16 @@ GameWindow {
 			}
         }
 
-		Ghost {
-			team: enemyTeam
-			target: player
-			x: levelWalls.x + levelSize * 0.2
-			y: levelWalls.y + levelSize * 0.4
-		}
-
-		Mage {
-			team: enemyTeam
-			target: player
-			x: levelWalls.x + levelSize * 0.7
-			y: levelWalls.y + levelSize * 0.2
+		WaveManager {
+			enemyTeam: enemyTeam
+			player: player
+			waveTypes: [
+				[Qt.resolvedUrl("./entities/Ghost.qml")]
+			]
+			initialDelay: 6000
+			inBetweenWavesDelay: 5000
+			spawnAreaMin: Qt.point(levelWalls.x, levelWalls.y)
+			spawnAreaMax: Qt.point(levelWalls.x + levelSize, levelWalls.y + levelSize)
 		}
 
 		MouseArea {
