@@ -19,6 +19,10 @@ GameWindow {
         id: scene
         focus: true
 
+		Component.onCompleted: {
+			scene.initializeWaveVariants();
+		}
+
         Item {
             id: level
         }
@@ -139,16 +143,31 @@ GameWindow {
 			}
         }
 
+		property url ghostPrefab: Qt.resolvedUrl("./entities/Ghost.qml")
+		property url magePrefab: Qt.resolvedUrl("./entities/Mage.qml")
+
 		WaveManager {
+			id: waveManager
 			enemyTeam: enemyTeam
 			player: player
-			waveTypes: [
-				[Qt.resolvedUrl("./entities/Ghost.qml")]
-			]
+			waveTypes: []
 			initialDelay: 6000
 			inBetweenWavesDelay: 5000
-			spawnAreaMin: Qt.point(levelWalls.x + levelSize * 0.5 + 48, levelWalls.y - levelSize * 0.5 + 48)
-			spawnAreaMax: Qt.point(levelWalls.x + levelSize * 0.5 - 48, levelWalls.y + levelSize * 0.5 - 48)
+			spawnAreaMin: Qt.point(levelWalls.x + 48, levelWalls.y + 48)
+			spawnAreaMax: Qt.point(levelWalls.x + levelSize - 48, levelWalls.y + levelSize - 48)
+		}
+
+		function initializeWaveVariants() {
+			let ghostPrefab = Qt.resolvedUrl("./entities/Ghost.qml");
+			let magePrefab = Qt.resolvedUrl("./entities/Mage.qml");
+
+			waveManager.waveTypes = [
+				[ghostPrefab],
+				[magePrefab],
+				[ghostPrefab, ghostPrefab],
+				[magePrefab, magePrefab],
+				[magePrefab, ghostPrefab],
+			];
 		}
 
 		MouseArea {

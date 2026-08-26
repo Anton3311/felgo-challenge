@@ -4,7 +4,6 @@ import "./components"
 
 EntityBase {
 	id: marker
-    entityId: "spawnMarker"
     entityType: "spawnMarker"
 
 	property url enemyPrefab
