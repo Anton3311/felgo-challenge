@@ -18,6 +18,11 @@ GameWindow {
 
 	property int backgroundZOrder: -100
 
+	FontLoader {
+		id: pixelFont
+		source: "../assets/fonts/Jersey10-Regular.ttf"
+	}
+
     Scene {
         id: scene
         focus: true
@@ -189,6 +194,16 @@ GameWindow {
 			damagable: player.damagable
 			fullHeartImage: Qt.resolvedUrl("../assets/entities/heartFull.png")
 			emptyHeartImage: Qt.resolvedUrl("../assets/entities/heartEmpty.png")
+		}
+
+		Text {
+			width: parent.width
+			horizontalAlignment: Text.AlignRight
+			text: "Wave " + waveManager.waveIndex
+			font.family: pixelFont.font.family
+			font.styleName: pixelFont.font.styleName
+			font.pixelSize: 24
+			color: "white"
 		}
 	}
 }

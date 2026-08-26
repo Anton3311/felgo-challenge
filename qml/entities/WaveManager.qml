@@ -7,6 +7,8 @@ EntityBase {
 	entityType: "waveManager"
     id: self
 
+	property int waveIndex: 0
+
 	property Team enemyTeam
 	property EntityBase player
 
@@ -122,6 +124,8 @@ EntityBase {
 
 		self.markers.length = 0;
 		state = "waitForCompletion"
+
+		self.waveIndex += 1;
 	}
 
 	function reportEnemyGotKilled() {
