@@ -140,11 +140,16 @@ GameWindow {
         }
 
 		BasicEnemy {
-			id: enemy
 			team: enemyTeam
 			target: player
 			x: levelWalls.x + levelSize * 0.2
 			y: levelWalls.y + levelSize * 0.4
+		}
+
+		Mage {
+			team: enemyTeam
+			x: levelWalls.x + levelSize * 0.7
+			y: levelWalls.y + levelSize * 0.2
 		}
 
 		MouseArea {
