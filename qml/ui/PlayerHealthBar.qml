@@ -23,8 +23,8 @@ Item {
 			Image {
 				source: self.fullHeartImage
 				fillMode: Image.PreserveAspectCrop
-				width: 16
-				height: 16
+				width: 32
+				height: 32
 				smooth: false
 			}
 		}
@@ -33,8 +33,8 @@ Item {
 			Image {
 				source: self.emptyHeartImage
 				fillMode: Image.PreserveAspectCrop
-				width: 16
-				height: 16
+				width: 32
+				height: 32
 				smooth: false
 			}
 		}
