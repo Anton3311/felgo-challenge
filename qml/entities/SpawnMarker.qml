@@ -23,8 +23,6 @@ EntityBase {
 	}
 
 	GameSpriteSequence {
-		x: 50
-		y: 200
 		width: 32
 		height: 32
 		GameSprite {
