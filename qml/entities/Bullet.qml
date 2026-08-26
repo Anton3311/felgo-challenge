@@ -40,8 +40,8 @@ EntityBase {
 			smooth: false
             anchors.centerIn: parent
             source: Qt.resolvedUrl("../../assets/entities/bullet.png")
-            width: 16
-            height: 16
+            width: 32
+            height: 32
         }
     }
 
