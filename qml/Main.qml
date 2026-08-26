@@ -139,7 +139,7 @@ GameWindow {
 			}
         }
 
-		BasicEnemy {
+		Ghost {
 			team: enemyTeam
 			target: player
 			x: levelWalls.x + levelSize * 0.2
