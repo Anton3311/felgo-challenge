@@ -10,7 +10,8 @@ GameWindow {
     screenWidth: 960
     screenHeight: 640
 
-	property int levelSize: 300
+	// This exactly matches the size of the level backrgound image
+	property int levelSize: 176 * 2
 	property int wallThickness: 10
 
 	property int wallCategory: Fixture.Category1
@@ -44,6 +45,8 @@ GameWindow {
 		Keys.forwardTo: player.controller
 
 		EntityBase {
+			// Display the level background below everything
+			z: -100
 			id: levelWalls
 			width: levelSize
 			height: levelSize
@@ -55,10 +58,6 @@ GameWindow {
 				bodyType: Body.Static
 				categories: wallCategory
 			}
-			Rectangle {
-				width: parent.width; height: wallThickness
-				color: "blue"
-			}
 
 			// Down
 			BoxCollider {
@@ -67,21 +66,12 @@ GameWindow {
 				bodyType: Body.Static
 				categories: wallCategory
 			}
-			Rectangle {
-				y: levelSize - wallThickness
-				width: parent.width; height: wallThickness
-				color: "blue"
-			}
 
 			// Left
 			BoxCollider {
 				width: wallThickness; height: levelSize 
 				bodyType: Body.Static
 				categories: wallCategory
-			}
-			Rectangle {
-				width: wallThickness; height: levelSize
-				color: "blue"
 			}
 
 			// Right
@@ -91,10 +81,12 @@ GameWindow {
 				bodyType: Body.Static
 				categories: wallCategory
 			}
-			Rectangle {
-				x: levelSize - wallThickness
-				width: wallThickness; height: levelSize
-				color: "blue"
+
+			Image {
+				smooth: false
+				width: 176 * 2
+				height: 176 * 2
+				source: Qt.resolvedUrl("../assets/entities/levelBackground.png")
 			}
 		}
 
