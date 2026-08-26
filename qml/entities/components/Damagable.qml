@@ -18,6 +18,11 @@ Item {
     signal death
 
     function applyDamage(damage) {
+		if (health == 0) {
+			// Already dead => early return here, to avoid emitting `death` signal one more time.
+			return;
+		}
+
         // Clamp the damage, so that the health doesn't become negative
         //
         // Also when reporting damage to the event system, we want to
