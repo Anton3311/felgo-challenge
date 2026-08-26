@@ -6,6 +6,7 @@ Item {
 	property Team team
 	property url bulletPrefab
 	property Item emissionOrigin
+	property point emissionOriginOffset: Qt.point(0, 0)
 
 	property var queue: []
 
@@ -45,8 +46,8 @@ Item {
 		entityManager.createEntityFromUrlWithProperties(
 			bulletPrefab,
 			{
-				"x": positionX + self.emissionOrigin.x,
-				"y": positionY + self.emissionOrigin.y,
+				"x": positionX + self.emissionOrigin.x + self.emissionOriginOffset.x,
+				"y": positionY + self.emissionOrigin.y + self.emissionOriginOffset.y,
 				"initialImpulse": forceVector,
 				"team": self.team
 			}

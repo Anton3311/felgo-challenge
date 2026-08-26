@@ -35,6 +35,7 @@ EntityBase {
 		id: bulletEmitter
 		emissionOrigin: self
 		bulletPrefab: Qt.resolvedUrl("./Bullet.qml")
+		emissionOriginOffset: Qt.point(sprite.width * 0.5, sprite.height * 0.5)
 	}
 
 	CircleCollider {

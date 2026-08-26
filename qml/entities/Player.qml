@@ -23,6 +23,7 @@ EntityBase {
 		damagable.team = team
 		bulletEmitter.team = team
 		bulletEmitter.emissionOrigin = player
+		bulletEmitter.emissionOriginOffset = Qt.point(sprite.width * 0.5, sprite.height * 0.5)
 	}
 
 	Damagable {
@@ -39,6 +40,7 @@ EntityBase {
 		fixedRotation: true
 
 		Image {
+			id: sprite
 			anchors.centerIn: parent.anchors.center
 			smooth: false
 			source: Qt.resolvedUrl("../../assets/entities/player.png")

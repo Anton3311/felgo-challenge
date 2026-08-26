@@ -48,6 +48,7 @@ EntityBase {
 		id: bulletEmitter
 		emissionOrigin: self
 		bulletPrefab: Qt.resolvedUrl("./Bullet.qml")
+		emissionOriginOffset: Qt.point(sprite.width * 0.5, sprite.height * 0.5)
 	}
 
 	function isTargetWithinRange() {
@@ -155,6 +156,7 @@ EntityBase {
 		linearDamping: 1
 
 		Image {
+			id: sprite
 			anchors.centerIn: parent.anchors.center
 			smooth: false
 			source: Qt.resolvedUrl("../../assets/entities/ghost.png")
