@@ -11,7 +11,7 @@ Scene {
 
 	property font pixelFont
 
-	// This exactly matches the size of the level backrgound image
+	// This exactly matches the size of the level background image
 	property int levelSize: 176 * 2
 	property int wallThickness: 10
 
@@ -21,6 +21,8 @@ Scene {
 
 	Component.onCompleted: {
 		scene.initializeWaveVariants();
+		levelBackground.levelSize = levelSize
+		levelBackground.wallThickness = wallThickness
 	}
 
 	Item {
@@ -44,57 +46,13 @@ Scene {
 	Keys.forwardTo: player.controller
 
 	// Fill the whole screen with a solid color matching the borders of the background sprite
-	Rectangle {
-		z: backgroundZOrder
+	LevelBackground {
+		id: levelBackground
 		anchors.fill: scene
-		color: "#763b36"
-	}
-
-	EntityBase {
-		// Display the level background below everything
 		z: backgroundZOrder
-		id: levelWalls
-		width: levelSize
-		height: levelSize
-		anchors.centerIn: scene
-
-		// Left
-		BoxCollider {
-			width: parent.width; height: wallThickness
-			bodyType: Body.Static
-			categories: wallCategory
-		}
-
-		// Down
-		BoxCollider {
-			y: levelSize - wallThickness
-			width: parent.width; height: wallThickness
-			bodyType: Body.Static
-			categories: wallCategory
-		}
-
-		// Left
-		BoxCollider {
-			width: wallThickness; height: levelSize 
-			bodyType: Body.Static
-			categories: wallCategory
-		}
-
-		// Right
-		BoxCollider {
-			x: levelSize - wallThickness
-			width: wallThickness; height: levelSize
-			bodyType: Body.Static
-			categories: wallCategory
-		}
-
-		Image {
-			smooth: false
-			width: levelSize
-			height: levelSize
-			source: Qt.resolvedUrl("../../assets/entities/levelBackground.png")
-		}
 	}
+
+	property alias levelWalls: levelBackground.levelWalls
 
 	Team {
 		id: playerTeam
