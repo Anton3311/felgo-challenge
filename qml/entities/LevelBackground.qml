@@ -7,6 +7,7 @@ Item {
 
 	property alias levelWalls: walls
 
+	// Fill the whole screen with a solid color matching the borders of the background sprite
 	Rectangle {
 		anchors.fill: parent
 		color: "#763b36"

@@ -14,15 +14,15 @@ Scene {
 	// This exactly matches the size of the level background image
 	property int levelSize: 176 * 2
 	property int wallThickness: 10
-
 	property int wallCategory: Fixture.Category1
-
 	property int backgroundZOrder: -100
 
 	Component.onCompleted: {
 		scene.initializeWaveVariants();
 		levelBackground.levelSize = levelSize
 		levelBackground.wallThickness = wallThickness
+
+		scene.x = 0;
 	}
 
 	Item {
@@ -45,7 +45,6 @@ Scene {
 
 	Keys.forwardTo: player.controller
 
-	// Fill the whole screen with a solid color matching the borders of the background sprite
 	LevelBackground {
 		id: levelBackground
 		anchors.fill: scene
