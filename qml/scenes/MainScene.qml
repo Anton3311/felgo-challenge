@@ -11,13 +11,11 @@ Scene {
 	property font pixelFont
 
 	property int levelSize: 176 * 2
-	property int wallThickness: 10
 	property int wallCategory: Fixture.Category1
 	property int backgroundZOrder: -100
 
 	Component.onCompleted: {
 		levelBackground.levelSize = levelSize
-		levelBackground.wallThickness = wallThickness
 	}
 
 	Item {

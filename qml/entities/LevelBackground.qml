@@ -3,7 +3,7 @@ import Felgo
 
 Item {
 	property int levelSize
-	property int wallThickness
+	property int wallThickness: 30
 
 	property alias levelWalls: walls
 
@@ -20,8 +20,10 @@ Item {
 		height: levelSize
 		anchors.centerIn: parent
 
-		// Left
+		// Top
 		BoxCollider {
+			// Move the top one down a bit, so that it covers the top wall
+			y: 16
 			width: parent.width; height: wallThickness
 			bodyType: Body.Static
 			categories: wallCategory
