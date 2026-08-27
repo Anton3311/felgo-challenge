@@ -13,7 +13,7 @@ GameWindow {
 		source: "../assets/fonts/Jersey10-Regular.ttf"
 	}
 
-	MainScene {
+	GameScene {
 		id: mainScene
 		pixelFont: pixelFont.font
 	}
