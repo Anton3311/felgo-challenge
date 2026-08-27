@@ -78,6 +78,28 @@ Scene {
 		bulletCollisionCategories: wallCategory | Fixture.Category2
 	}
 
+	Timer {
+		id: gameOverTimer
+		interval: 1500
+		repeat: false
+		onTriggered: {
+			gameWindow.state = "main"
+		}
+	}
+
+	Text {
+		id: gameOverText
+		y: 48
+		width: parent.width
+		horizontalAlignment: Text.Center
+		text: "Game Over"
+		font.family: pixelFont.family
+		font.styleName: pixelFont.styleName
+		font.pixelSize: 32
+		color: "#e84537"
+		opacity: 0
+	}
+
 	Player {
 		id: player
 		team: playerTeam
@@ -85,6 +107,11 @@ Scene {
 		crosshair: crosshair
 		x: levelWalls.x + levelSize / 2
 		y: levelWalls.y + levelSize / 4 * 3
+		onDeath: {
+			gameOverTimer.start()
+			player.enabled = false
+			gameOverText.opacity = 1
+		}
 	}
 
 	EntityBase {

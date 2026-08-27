@@ -19,6 +19,8 @@ EntityBase {
 	property bool isMovingUp
 	property bool isMovingDown
 
+	signal death()
+
 	Component.onCompleted: {
 		damagable.team = team
 		bulletEmitter.team = team
@@ -29,6 +31,9 @@ EntityBase {
 	Damagable {
 		id: myDamagable
 		maxHealth: 6
+		onDeath: {
+			player.death()
+		}
 	}
 
 	CircleCollider {
