@@ -1,0 +1,8 @@
+project = Tutorial
+description = Bullet Hell Game Tutirial using Felgo
+
+outputdir = ./html
+outputformats = HTML
+
+sourcedirs = .
+sources = ./tutorial.qdoc

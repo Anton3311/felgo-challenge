@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE QDOCINDEX>
+<INDEX url="" title="Bullet Hell Game Tutirial using Felgo" version="" project="Tutorial">
+    <namespace name="" status="active" access="public" module="tutorial">
+        <page name="tutorial.html" href="tutorial.html" status="active" location="tutorial.qdoc" filepath="E:/felgo-projects/BulletHellGame/docs/tutorial.qdoc" lineno="1" documented="true" subtype="page" title="Bullet Hell Game Tutorial using Felgo" fulltitle="Bullet Hell Game Tutorial using Felgo" subtitle="">
+            <contents name="introduction" title="Introduction" level="1"/>
+            <contents name="assets" title="Assets" level="1"/>
+            <contents name="project-setup" title="Project Setup" level="1"/>
+            <contents name="player" title="Player" level="1"/>
+        </page>
+    </namespace>
+</INDEX>
