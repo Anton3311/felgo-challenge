@@ -22,15 +22,27 @@
 <div class="descr" id="details">
 <h2 id="introduction">Introduction</h2>
 <p>This tutorial describes how to create a simple 2D Bullet Hell Game using Felgo.</p>
-<p>The tutorial will go in details on how to implement the player control and shooting mechanics, enemies and their attack patterns, wave spawning and scene management.</p>
-<p>The source code for the finished is available on <a href="https://github.com/Anton3311/felgo-challenge">GitHub</a></p>
+<p>The tutorial will provide a base for the overall game, enabling anyone to further expand on it. Here we will go in details on how to implement the player controls and shooting mechanics, enemies, their state machines and attack patterns, wave spawning and scene management.</p>
+<p>The source code for the finished project is available on <a href="https://github.com/Anton3311/felgo-challenge">GitHub</a></p>
 <h2 id="assets">Assets</h2>
-<p>The art assets used throughout this tutorial are from Kenney and are available <a href="https://kenney.nl/assets/tiny-dungeon">here</a> under CC0 1.0 License. This asset pack doesn't cover all of the need art assets, thus some of the missing ones were hand-drawn in the same style. All of the used art assets are available in GitHub Repository under <a href="https://github.com/Anton3311/felgo-challenge/tree/main/assets/entities">assets/entities</a></p>
+<p>The art assets used throughout this tutorial are from Kenney and are available <a href="https://kenney.nl/assets/tiny-dungeon">here</a> under CC0 1.0 License. This asset pack doesn't cover all of the needed art, thus some of the missing pieces were hand-drawn in the same style. All of the used art assets are available in GitHub Repository under <a href="https://github.com/Anton3311/felgo-challenge/tree/main/assets/entities">assets/entities</a></p>
 <p>The pixel font used in the game is available on <a href="https://fonts.google.com/specimen/Jersey+10?query=Jersey+10&preview.script=Latn">Google Fonts</a></p>
 <h2 id="project-setup">Project Setup</h2>
-<p>Start by creating a new <b>Felgo Games</b> project in Qt Creator. Sepcifically we will need <b>New - Empty Felgo Project</b> template.</p>
+<p>Start by creating a new <b>Felgo Games</b> project in Qt Creator. Sepcifically we will need <b>New - Empty Felgo Project</b> template. The created project will already contain some example code in the <code translate="no">Main.qml</code>, which we will reduce down to these 15:</p>
+<pre class="cpp" translate="no">import Felgo <span class="number">4.0</span>
+import <span class="type">QtQuick</span> <span class="number">2.0</span>
+
+GameWindow {
+        id: gameWindow
+        activeScene: scene
+        screenWidth: <span class="number">960</span>
+        screenHeight: <span class="number">640</span>
+
+        Scene {
+                id: scene
+        }
+}</pre>
 <h2 id="player">Player</h2>
-<pre class="cpp" translate="no"></pre>
 </div>
 <!-- @@@tutorial.html -->
 </body>

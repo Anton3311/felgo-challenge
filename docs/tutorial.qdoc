@@ -21,10 +21,21 @@
 	\section1 Project Setup
 
 	Start by creating a new \b{Felgo Games} project in Qt Creator. Sepcifically we will need
-	\b{New - Empty Felgo Project} template.
-
-	\section1 Player
+	\b{New - Empty Felgo Project} template. The created project will already contain some example code in the \c{Main.qml}, which we will reduce down to these 15:
 
 	\code
+	import Felgo 4.0
+	import QtQuick 2.0
+
+	GameWindow {
+		id: gameWindow
+		activeScene: scene
+		screenWidth: 960
+		screenHeight: 640
+
+		Scene {
+			id: scene
+		}
+	}
 	\endcode
 */
