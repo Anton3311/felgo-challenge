@@ -120,7 +120,7 @@ EntityBase {
 			let angleTowardsTarget = Math.atan2(dy, dx)
 
 			let spread = Math.PI / 6;
-			let count = 6;
+			let count = 4;
 			for (let i = 0; i < count; i += 1) {
 				let spreadAngle = randomInRange(-spread / 2, spread / 2)
 				let angle = angleTowardsTarget + spreadAngle
