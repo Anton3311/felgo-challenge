@@ -13,7 +13,7 @@
 <li class="level1"><a href="#introduction">Introduction</a></li>
 <li class="level1"><a href="#assets">Assets</a></li>
 <li class="level1"><a href="#project-setup">Project Setup</a></li>
-<li class="level1"><a href="#player">Player</a></li>
+<li class="level1"><a href="#player-controls">Player Controls</a></li>
 </ul>
 </div>
 <div class="sidebar-content" id="sidebar-content"></div></div>
@@ -29,20 +29,207 @@
 <p>The pixel font used in the game is available on <a href="https://fonts.google.com/specimen/Jersey+10?query=Jersey+10&preview.script=Latn">Google Fonts</a></p>
 <h2 id="project-setup">Project Setup</h2>
 <p>Start by creating a new <b>Felgo Games</b> project in Qt Creator. Sepcifically we will need <b>New - Empty Felgo Project</b> template. The created project will already contain some example code in the <code translate="no">Main.qml</code>, which we will reduce down to these 15:</p>
-<pre class="cpp" translate="no">import Felgo <span class="number">4.0</span>
-import <span class="type">QtQuick</span> <span class="number">2.0</span>
+<pre class="qml" translate="no">import Felgo 4.0
+import QtQuick 2.0
 
-GameWindow {
-        id: gameWindow
-        activeScene: scene
-        screenWidth: <span class="number">960</span>
-        screenHeight: <span class="number">640</span>
+<span class="type">GameWindow</span> {
+        <span class="name">id</span>: <span class="name">gameWindow</span>
+        <span class="name">activeScene</span>: <span class="name">scene</span>
+        <span class="name">screenWidth</span>: <span class="number">960</span>
+        <span class="name">screenHeight</span>: <span class="number">640</span>
 
-        Scene {
-                id: scene
+        <span class="type">Scene</span> {
+                <span class="name">id</span>: <span class="name">scene</span>
         }
 }</pre>
-<h2 id="player">Player</h2>
+<h2 id="player-controls">Player Controls</h2>
+<p>As the first major step, we will start with the player controller, to get at least something moving on the screen. But before we dive into coding a player control, we need to prepare out scene.</p>
+<p>Firstly our player is an entity, and to be able to work with entities, our scene needs an entity manager. So we add one:</p>
+<pre class="cpp" translate="no"><span class="comment">// This `Item` serves as a container for all entities. Any entities created during the game,</span>
+<span class="comment">// will be added to this container.</span>
+Item {
+        id: level
+}
+
+EntityManager {
+        id: entityManager
+        entityContainer: level
+}</pre>
+<p>Now that, we have an entity manager, we can start creating our player.</p>
+<p>The code for the player will live in <code translate="no">qml/entities/Player.qml</code>.</p>
+<pre class="qml" translate="no">import QtQuick
+import Felgo
+
+<span class="type">EntityBase</span> {
+        <span class="name">id</span>: <span class="name">player</span>
+        <span class="name">entityId</span>: <span class="string">&quot;entity&quot;</span>
+        <span class="name">entityType</span>: <span class="string">&quot;player&quot;</span>
+
+        <span class="type">Image</span> {
+                <span class="name">id</span>: <span class="name">sprite</span>
+                <span class="comment">// Place the player sprite right in the center of the entity</span>
+                <span class="name">anchors</span>.centerIn: <span class="name">parent</span>.<span class="name">anchors</span>.<span class="name">center</span>
+                <span class="comment">// Disable smoothing to keep the pixel art crisp.</span>
+                <span class="name">smooth</span>: <span class="number">false</span>
+                <span class="name">source</span>: <span class="name">Qt</span>.<span class="name">resolvedUrl</span>(<span class="string">&quot;../../assets/entities/player.png&quot;</span>)
+                <span class="name">width</span>: <span class="number">32</span>
+                <span class="name">height</span>: <span class="number">32</span>
+        }
+}</pre>
+<p>And then in our <code translate="no">Main.qml</code> we will first import the code from entities folder:</p>
+<pre class="cpp" translate="no">import Felgo <span class="number">4.0</span>
+import <span class="type">QtQuick</span> <span class="number">2.0</span>
+import <span class="string">&quot;./entities&quot;</span></pre>
+<p>Finally add our <code translate="no">Player</code> right after the <code translate="no">EntityManager</code>, like this:</p>
+<pre class="qml" translate="no"><span class="type">Scene</span> {
+        <span class="name">id</span>: <span class="name">scene</span>
+
+        <span class="type">EntityManager</span> {
+                <span class="name">id</span>: <span class="name">entityManager</span>
+                <span class="name">entityContainer</span>: <span class="name">level</span>
+        }
+
+        <span class="type">Player</span> {}
+}</pre>
+<p>Now lets move onto player controls. Out will rely on physics, that means we first need to setup a <code translate="no">PhysicsWorld</code>:</p>
+<pre class="qml" translate="no"><span class="type">Scene</span> {
+        <span class="name">id</span>: <span class="name">scene</span>
+
+        <span class="type">EntityManager</span> {
+                <span class="name">id</span>: <span class="name">entityManager</span>
+                <span class="name">entityContainer</span>: <span class="name">level</span>
+        }
+
+        <span class="type">PhysicsWorld</span> {
+                <span class="name">id</span>: <span class="name">physicsWorld</span>
+                <span class="name">gravity</span>.y: <span class="number">0</span>
+                <span class="name">updatesPerSecondForPhysics</span>: <span class="number">60</span>
+                <span class="name">velocityIterations</span>: <span class="number">5</span>
+                <span class="name">positionIterations</span>: <span class="number">5</span>
+                <span class="name">debugDrawVisible</span>: <span class="number">false</span>
+        }
+
+        <span class="type">Player</span> {}
+}</pre>
+<p>Now that we have the <code translate="no">PhysicsWorld</code>, we can add a collider to our player. We will also make our player sprite a child of the collider. The resulting player code looks like this:</p>
+<pre class="qml" translate="no"><span class="type">CircleCollider</span> {
+        <span class="name">id</span>: <span class="name">collider</span>
+        <span class="name">radius</span>: <span class="number">16</span>
+        <span class="comment">// Disable rotations caused by collisions.</span>
+        <span class="name">fixedRotation</span>: <span class="number">true</span>
+
+        <span class="type">Image</span> {
+                <span class="name">id</span>: <span class="name">sprite</span>
+                <span class="name">anchors</span>.centerIn: <span class="name">parent</span>.<span class="name">anchors</span>.<span class="name">center</span>
+                <span class="name">smooth</span>: <span class="number">false</span>
+                <span class="name">source</span>: <span class="name">Qt</span>.<span class="name">resolvedUrl</span>(<span class="string">&quot;../../assets/entities/player.png&quot;</span>)
+                <span class="name">width</span>: <span class="number">32</span>
+                <span class="name">height</span>: <span class="number">32</span>
+        }
+}</pre>
+<p>The final step before player is able to move around the scene, is the actual keyboard controls. Here we will use a <code translate="no">TwoAxisController</code> with our 4 movement directions mapped to WASD keys.</p>
+<p><code translate="no">TwoAxisController</code> has two property we are interested in: <code translate="no">xAxis</code> and <code translate="no">yAxis</code>.</p>
+<p>We can use them to provide a velocity vector for the <code translate="no">CircleCollider</code> like this:</p>
+<pre class="cpp" translate="no">linearVelocity: <span class="type">Qt</span><span class="operator">.</span>point(axisController<span class="operator">.</span>xAxis<span class="operator">,</span> axisController<span class="operator">.</span>yAxis)</pre>
+<p><code translate="no">TwoAxisController</code> is only able to notify us about, whenever a button gets pressed or release. However, we want to be able to presss and hold a button to move in a desired direction. This requires a bit more bookkeeping. We will need to keep track of which of the 4-direction keys are currently pressed and update that state on each press/release together with manually updating <code translate="no">xAxis</code> and <code translate="no">yAxis</code> properties of the controller.</p>
+<p>Add the <code translate="no">bool</code> properties, corresponding each of the movement directions, at the start of the <code translate="no">Player</code> entity:</p>
+<pre class="cpp" translate="no">property <span class="type">bool</span> isMovingLeft
+property <span class="type">bool</span> isMovingRight
+property <span class="type">bool</span> isMovingUp
+property <span class="type">bool</span> isMovingDown</pre>
+<p>Out <code translate="no">TwoAxisController</code> we will lok like this:</p>
+<pre class="qml" translate="no"><span class="type">TwoAxisController</span> {
+        <span class="name">id</span>: <span class="name">axisController</span>
+        <span class="name">onInputActionPressed</span>: (<span class="keyword"></span>actionName) =&gt; {
+                <span class="name">updateActionState</span>(<span class="name">actionName</span>, <span class="number">true</span>);
+                <span class="name">updateMovementAxis</span>();
+        }
+        <span class="name">onInputActionReleased</span>: (<span class="keyword"></span>actionName) =&gt; {
+                <span class="name">updateActionState</span>(<span class="name">actionName</span>, <span class="number">false</span>);
+                <span class="name">updateMovementAxis</span>();
+        }
+        <span class="name">inputActionsToKeyCode</span>: {
+                &quot;up&quot;: <span class="name">Qt</span>.<span class="name">Key_W</span>,
+                &quot;down&quot;: <span class="name">Qt</span>.<span class="name">Key_S</span>,
+                &quot;left&quot;: <span class="name">Qt</span>.<span class="name">Key_A</span>,
+                &quot;right&quot;: <span class="name">Qt</span>.<span class="name">Key_D</span>
+        }
+}</pre>
+<p>Also don't forget to add the <code translate="no">speed</code> property to the player entity:</p>
+<pre class="cpp" translate="no">property <span class="type">int</span> speed: <span class="number">150</span></pre>
+<p>And finally the helper functions for state tracking and updating controller properties:</p>
+<pre class="cpp" translate="no">function updateActionState(actionName<span class="operator">,</span> value) {
+        <span class="keyword">if</span> (actionName <span class="operator">=</span><span class="operator">=</span><span class="operator">=</span> <span class="string">&quot;up&quot;</span>) {
+                isMovingUp <span class="operator">=</span> value
+        }
+
+        <span class="keyword">if</span> (actionName <span class="operator">=</span><span class="operator">=</span><span class="operator">=</span> <span class="string">&quot;down&quot;</span>) {
+                isMovingDown <span class="operator">=</span> value
+        }
+
+        <span class="keyword">if</span> (actionName <span class="operator">=</span><span class="operator">=</span><span class="operator">=</span> <span class="string">&quot;left&quot;</span>) {
+                isMovingLeft <span class="operator">=</span> value
+        }
+
+        <span class="keyword">if</span> (actionName <span class="operator">=</span><span class="operator">=</span><span class="operator">=</span> <span class="string">&quot;right&quot;</span>) {
+                isMovingRight <span class="operator">=</span> value
+        }
+}
+
+function updateMovementAxis() {
+        let dx <span class="operator">=</span> <span class="number">0</span>;
+        let dy <span class="operator">=</span> <span class="number">0</span>;
+
+        <span class="keyword">if</span> (player<span class="operator">.</span>isMovingUp) {
+                dy <span class="operator">-</span><span class="operator">=</span> <span class="number">1</span>;
+        }
+
+        <span class="keyword">if</span> (player<span class="operator">.</span>isMovingDown) {
+                dy <span class="operator">+</span><span class="operator">=</span> <span class="number">1</span>;
+        }
+
+        <span class="keyword">if</span> (player<span class="operator">.</span>isMovingLeft) {
+                dx <span class="operator">-</span><span class="operator">=</span> <span class="number">1</span>;
+        }
+
+        <span class="keyword">if</span> (player<span class="operator">.</span>isMovingRight) {
+                dx <span class="operator">+</span><span class="operator">=</span> <span class="number">1</span>;
+        }
+
+        <span class="keyword">if</span> (dx <span class="operator">=</span><span class="operator">=</span><span class="operator">=</span> <span class="number">0</span> <span class="operator">&amp;</span><span class="operator">&amp;</span> dy <span class="operator">=</span><span class="operator">=</span><span class="operator">=</span> <span class="number">0</span>) {
+                axisController<span class="operator">.</span>xAxis <span class="operator">=</span> <span class="number">0</span>;
+                axisController<span class="operator">.</span>yAxis <span class="operator">=</span> <span class="number">0</span>;
+        } <span class="keyword">else</span> {
+                let deltaVectorLength <span class="operator">=</span> Math<span class="operator">.</span>sqrt(dx <span class="operator">*</span> dx <span class="operator">+</span> dy <span class="operator">*</span> dy);
+                let deltaScale <span class="operator">=</span> <span class="number">1</span> <span class="operator">/</span> deltaVectorLength <span class="operator">*</span> player<span class="operator">.</span>speed;
+
+                axisController<span class="operator">.</span>xAxis <span class="operator">=</span> dx <span class="operator">*</span> deltaScale;
+                axisController<span class="operator">.</span>yAxis <span class="operator">=</span> dy <span class="operator">*</span> deltaScale;
+        }
+}</pre>
+<p>One more final touch. We can set the <code translate="no">mirror</code> property of the <code translate="no">Image</code> to be computed based on the horiontal speed, so the player sprite gets mirrored when the player moves left.</p>
+<pre class="cpp" translate="no">mirror: collider<span class="operator">.</span>linearVelocity<span class="operator">.</span>x <span class="operator">&lt;</span> <span class="number">0</span></pre>
+<p>For the whole player controller to work, we also need to forward all of the key events from the scene to our <code translate="no">TwoAxisController</code>. For that we will first need expose the <code translate="no">TwoAxisController</code> inside the player to an outside world, by creating an <code translate="no">alias property</code>:</p>
+<pre class="cpp" translate="no">EntityBase {
+        id: player
+        entityId: <span class="string">&quot;entity&quot;</span>
+        entityType: <span class="string">&quot;player&quot;</span>
+
+        property <span class="type">int</span> speed: <span class="number">150</span>
+        property <span class="type">bool</span> isMovingLeft
+        property <span class="type">bool</span> isMovingRight
+        property <span class="type">bool</span> isMovingUp
+        property <span class="type">bool</span> isMovingDown
+
+        <span class="comment">// Expose the controller to an outside world</span>
+        property alias controller: axisController
+        <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span></pre>
+<p>And forward the events:</p>
+<pre class="cpp" translate="no">Keys<span class="operator">.</span>forwardTo: <span class="operator">[</span>player<span class="operator">.</span>controller<span class="operator">]</span>
+
+Player {
+        id: player
+}</pre>
 </div>
 <!-- @@@tutorial.html -->
 </body>
