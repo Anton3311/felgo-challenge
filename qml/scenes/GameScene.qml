@@ -17,6 +17,8 @@ Scene {
 	property int wallCategory: Fixture.Category1
 	property int backgroundZOrder: -100
 
+	signal gameOver(int wavesCompelted, int enemiesKilled)
+
 	Component.onCompleted: {
 		scene.initializeWaveVariants();
 		levelBackground.levelSize = levelSize
@@ -83,7 +85,7 @@ Scene {
 		interval: 1500
 		repeat: false
 		onTriggered: {
-			gameWindow.state = "main"
+			gameOver(waveManager.waveIndex, waveManager.enemiesKilled)
 		}
 	}
 

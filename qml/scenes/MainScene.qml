@@ -67,53 +67,40 @@ Scene {
 				font.pixelSize: 24
 				color: "white"
 			}
-			Row {
+			Column {
+				id: runStatistics
+				enabled: false
+				opacity: 0
 				width: parent.width
-				spacing: 6
-				Column {
-					width: parent.width * 0.5
-					Text {
-						width: parent.width
-						horizontalAlignment: Text.AlignRight
-						text: "Waves"
-						font.family: pixelFont.family
-						font.styleName: pixelFont.styleName
-						font.pixelSize: 16
-						color: "white"
-					}
-					Text {
-						width: parent.width
-						horizontalAlignment: Text.AlignRight
-						text: "Enemies killed"
-						font.family: pixelFont.family
-						font.styleName: pixelFont.styleName
-						font.pixelSize: 16
-						color: "white"
-					}
-				}
-				Column {
+				Text {
+					id: wavesCompletedText
 					width: parent.width
-					Text {
-						width: parent.width
-						horizontalAlignment: Text.AlignLeft
-						text: "10"
-						font.family: pixelFont.family
-						font.styleName: pixelFont.styleName
-						font.pixelSize: 16
-						color: "white"
-					}
-					Text {
-						width: parent.width
-						horizontalAlignment: Text.AlignLeft
-						text: "10"
-						font.family: pixelFont.family
-						font.styleName: pixelFont.styleName
-						font.pixelSize: 16
-						color: "white"
-					}
+					horizontalAlignment: Text.Center
+					text: ""
+					font.family: pixelFont.family
+					font.styleName: pixelFont.styleName
+					font.pixelSize: 16
+					color: "white"
+				}
+				Text {
+					id: enemiesKilledText
+					width: parent.width
+					horizontalAlignment: Text.Center
+					text: ""
+					font.family: pixelFont.family
+					font.styleName: pixelFont.styleName
+					font.pixelSize: 16
+					color: "white"
 				}
 			}
 		}
+	}
+
+	function displayRunStatistics(wavesCompleted, enemiesKilled) {
+		runStatistics.enabled = true;
+		runStatistics.opacity = 1
+		wavesCompletedText.text = "Waves completed " + wavesCompleted
+		enemiesKilledText.text = "Enemies killed " + enemiesKilled
 	}
 
 	property alias levelWalls: levelBackground.levelWalls

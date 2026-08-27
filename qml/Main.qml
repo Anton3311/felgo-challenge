@@ -46,6 +46,10 @@ GameWindow {
 		onLoaded: {
 			gameSceneLoader.item.pixelFont = pixelFont.font
 			gameSceneLoader.Keys.forwardTo = [gameSceneLoader.item]
+			gameSceneLoader.item.onGameOver.connect((wavesCompleted, enemiesKilled) => {
+				mainScene.displayRunStatistics(wavesCompleted, enemiesKilled);
+				gameWindow.state = "main"
+			})
 		}
 	}
 

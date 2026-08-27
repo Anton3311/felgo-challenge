@@ -8,6 +8,7 @@ EntityBase {
     id: self
 
 	property int waveIndex: 0
+	property int enemiesKilled: 0
 
 	property Team enemyTeam
 	property EntityBase player
@@ -134,6 +135,7 @@ EntityBase {
 		}
 
 		self.currentEnemyCount -= 1
+		self.enemiesKilled += 1
 		if (self.currentEnemyCount == 0) {
 			// The player has killed all the enemies, prepare the next wave.
 			self.prepareNextWave();
