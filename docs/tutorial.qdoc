@@ -290,7 +290,7 @@
 		...
 	\endcode
 
-	And forward the events:
+	And forward the events by adding this code in our \c{Main.qml}:
 
 	\code
 	Keys.forwardTo: [player.controller]
@@ -300,6 +300,6 @@
 	}
 	\endcode
 
-	At this point the player should be capable to move around the screen.
+	At this point the player should be able to move around the screen.
 
 */
