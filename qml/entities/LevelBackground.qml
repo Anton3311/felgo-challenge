@@ -2,8 +2,9 @@ import QtQuick
 import Felgo
 
 Item {
-	property int levelSize
+	property int levelSize: 176 * 2
 	property int wallThickness: 30
+	property int wallCategory: Fixture.Category1
 
 	property alias levelWalls: walls
 

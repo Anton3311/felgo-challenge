@@ -12,15 +12,12 @@ Scene {
 	property font pixelFont
 
 	// This exactly matches the size of the level background image
-	property int levelSize: 176 * 2
-	property int wallCategory: Fixture.Category1
 	property int backgroundZOrder: -100
 
 	signal gameOver(int wavesCompelted, int enemiesKilled)
 
 	Component.onCompleted: {
 		scene.initializeWaveVariants();
-		levelBackground.levelSize = levelSize
 
 		scene.x = 0;
 	}
@@ -57,25 +54,29 @@ Scene {
 		id: playerTeam
 		debugName: "player"
 		entityCategory: Fixture.Category2
-		entityCollisionCategories: wallCategory | Fixture.Category2 | Fixture.Category4
+		entityCollisionCategories: levelBackground.wallCategory
+			| Fixture.Category2
+			| Fixture.Category4
 		bulletCategory: Fixture.Category4
 
 		// Don't include `entityCategory` (`Fixture.Category2`) in the collision mask, so that
 		// the player doesn't collide with its own bullets.
-		bulletCollisionCategories: wallCategory | Fixture.Category3
+		bulletCollisionCategories: levelBackground.wallCategory | Fixture.Category3
 	}
 
 	Team {
 		id: enemyTeam
 		debugName: "enemies"
 		entityCategory: Fixture.Category3
-		entityCollisionCategories: wallCategory | Fixture.Category3 | Fixture.Category4
+		entityCollisionCategories: levelBackground.wallCategory
+			| Fixture.Category3
+			| Fixture.Category4
 		bulletCategory: Fixture.Category4
 
 		// Don't include `Fixture.Category3` which is an `entityCategory`, to make sure that the
 		// bullets created by enemies, don't collide with other enemies, as well as, the one
 		// that created them
-		bulletCollisionCategories: wallCategory | Fixture.Category2
+		bulletCollisionCategories: levelBackground.wallCategory | Fixture.Category2
 	}
 
 	Timer {
@@ -105,8 +106,8 @@ Scene {
 		team: playerTeam
 		speed: 150
 		crosshair: crosshair
-		x: levelWalls.x + levelSize / 2
-		y: levelWalls.y + levelSize / 4 * 3
+		x: levelWalls.x + levelBackground.levelSize / 2
+		y: levelWalls.y + levelBackground.levelSize / 4 * 3
 		onDeath: {
 			gameOverTimer.start()
 			player.enabled = false
@@ -133,7 +134,9 @@ Scene {
 		initialDelay: 6000
 		inBetweenWavesDelay: 5000
 		spawnAreaMin: Qt.point(levelWalls.x + 48, levelWalls.y + 48)
-		spawnAreaMax: Qt.point(levelWalls.x + levelSize - 48, levelWalls.y + levelSize - 48)
+		spawnAreaMax: Qt.point(
+			levelWalls.x + levelBackground.levelSize - 48,
+			levelWalls.y + levelBackground.levelSize - 48)
 	}
 
 	function initializeWaveVariants() {

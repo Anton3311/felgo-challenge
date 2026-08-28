@@ -9,14 +9,7 @@ Scene {
 	id: scene
 
 	property font pixelFont
-
-	property int levelSize: 176 * 2
-	property int wallCategory: Fixture.Category1
 	property int backgroundZOrder: -100
-
-	Component.onCompleted: {
-		levelBackground.levelSize = levelSize
-	}
 
 	Item {
 		id: level
@@ -107,12 +100,12 @@ Scene {
 		id: playerTeam
 		debugName: "player"
 		entityCategory: Fixture.Category2
-		entityCollisionCategories: wallCategory | Fixture.Category2 | Fixture.Category4
+		entityCollisionCategories: levelBackground.wallCategory | Fixture.Category2 | Fixture.Category4
 		bulletCategory: Fixture.Category4
 
 		// Don't include `entityCategory` (`Fixture.Category2`) in the collision mask, so that
 		// the player doesn't collide with its own bullets.
-		bulletCollisionCategories: wallCategory | Fixture.Category3
+		bulletCollisionCategories: levelBackground.wallCategory | Fixture.Category3
 	}
 
 	Player {
@@ -120,7 +113,7 @@ Scene {
 		team: playerTeam
 		speed: 150
 		crosshair: crosshair
-		x: levelWalls.x + levelSize / 2
-		y: levelWalls.y + levelSize / 4 * 3
+		x: levelWalls.x + levelBackground.levelSize / 2
+		y: levelWalls.y + levelBackground.levelSize / 4 * 3
 	}
 }
