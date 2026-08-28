@@ -18,6 +18,7 @@
 <li class="level1"><a href="#level">Level</a></li>
 <li class="level1"><a href="#bullets-and-shooting">Bullets and Shooting</a></li>
 <li class="level3"><a href="#team-component">Team Component</a></li>
+<li class="level3"><a href="#shooting-bullets">Shooting Bullets</a></li>
 </ul>
 </div>
 <div class="sidebar-content" id="sidebar-content"></div></div>
@@ -303,7 +304,7 @@ import Felgo
         }
 }</pre>
 <p>The colliders here a placed to match where the walls are in the background sprite. If you set <code translate="no">debugDrawVisible</code> to <code translate="no">true</code> in the <code translate="no">PhysicsWorld</code> you will see the next picture:</p>
-<p class="centerAlign"><img src="images/levelColliders.png" alt="{Level Colliders}" /></p><p>Then we add it to out scene and also set <code translate="no">z</code> to some negative value, so that is appears under everything in the scene:</p>
+<p class="centerAlign"><img src="images/levelColliders.png" alt="{Level Colliders}" /></p><p>Then we add it to our scene and also set <code translate="no">z</code> to some negative value, so that is appears under everything in the scene:</p>
 <pre class="qml" translate="no"><span class="type">LevelBackground</span> {
         <span class="name">id</span>: <span class="name">levelBackground</span>
         <span class="name">z</span>: -<span class="number">100</span>
@@ -444,6 +445,163 @@ import Felgo
 }</pre>
 <p>Also don't forget to and the <code translate="no">import &quot;../components&quot;</code> in the <code translate="no">Player.qml</code> and <code translate="no">import &quot;./components&quot;</code> in the scene file.</p>
 <p>Now if you try running the game, you will see that ... nothing has changed. However, we are already a step closer to making the player shoot bullets.</p>
+<h4 id="shooting-bullets">Shooting Bullets</h4>
+<p>To shoot the player will have to press and hold the <code translate="no">Left Mouse Button</code>. To handle this, we will need to add a <code translate="no">MouseArea</code> to our scene:</p>
+<pre class="qml" translate="no"><span class="type">MouseArea</span> {
+        <span class="name">id</span>: <span class="name">mouseArea</span>
+        <span class="name">enabled</span>: <span class="number">true</span>
+        <span class="comment">// Cover the whole scene</span>
+        <span class="name">anchors</span>.fill: <span class="name">scene</span>
+        <span class="comment">// Make sure mouse hover event is reported, even if non of the mouse buttons were</span>
+        <span class="comment">// pressed/released.</span>
+        <span class="name">hoverEnabled</span>: <span class="number">true</span>
+        <span class="comment">// Hide the cursor. We will have a custom crosshair sprite instead.</span>
+        <span class="name">cursorShape</span>: <span class="string">&quot;BlankCursor&quot;</span>
+        <span class="name">onPositionChanged</span>: (<span class="keyword"></span>event) =&gt; {
+                <span class="comment">// handle mouse movement</span>
+        }
+        <span class="name">onPressed</span>: (<span class="keyword"></span>event) =&gt; {
+                <span class="comment">// start shooting</span>
+        }
+        <span class="name">onReleased</span>: (<span class="keyword"></span>event) =&gt; {
+                <span class="comment">// stop shooting</span>
+        }
+}</pre>
+<p>We will also add a crosshair to our scene. For now it will just be a white rectangle. Here we bind <code translate="no">x</code> and <code translate="no">y</code> to <code translate="no">mouseArea.mouseX</code> and <code translate="no">mouseArea.mouseY</code>, to make it follow the cursor:</p>
+<pre class="qml" translate="no"><span class="type">Rectangle</span> {
+        <span class="name">id</span>: <span class="name">crosshair</span>
+        <span class="name">x</span>: <span class="name">mouseArea</span>.<span class="name">mouseX</span>
+        <span class="name">y</span>: <span class="name">mouseArea</span>.<span class="name">mouseY</span>
+        <span class="name">width</span>: <span class="number">8</span>
+        <span class="name">height</span>: <span class="number">8</span>
+}</pre>
+<p>Now we will go back to <code translate="no">Player.qml</code> here we will need to reference the crosshair by adding a new property on the player:</p>
+<pre class="qml" translate="no"><span class="type">EntityBase</span> {
+        <span class="name">id</span>: <span class="name">player</span>
+
+        <span class="comment">// ...</span>
+
+        property <span class="type">bool</span> <span class="name">isMovingUp</span>
+        property <span class="type">bool</span> <span class="name">isMovingDown</span>
+        property <span class="type">Item</span> <span class="name">crosshair</span>
+
+        <span class="comment">// ...</span>
+}</pre>
+<p>And assing it in the scene:</p>
+<pre class="qml" translate="no"><span class="type">Player</span> {
+        <span class="name">id</span>: <span class="name">player</span>
+        <span class="comment">// ...</span>
+        <span class="name">crosshair</span>: <span class="name">crosshair</span>
+        <span class="comment">// ...</span>
+}</pre>
+<p>One last think to take care of, is that we need to add a reference to the <code translate="no">Team</code> instance in the <code translate="no">Bullet</code> entity. From that <code translate="no">Team</code> instance we will use earlier described <code translate="no">bulletCategory</code> and <code translate="no">bulletCollisionCategories</code>.</p>
+<pre class="qml" translate="no">import QtQuick
+import Felgo
+import &quot;../components&quot;
+
+<span class="type">EntityBase</span> {
+        <span class="name">id</span>: <span class="name">bullet</span>
+        <span class="name">entityId</span>: <span class="string">&quot;entity&quot;</span>
+        <span class="name">entityType</span>: <span class="string">&quot;bullet&quot;</span>
+
+        property <span class="type">int</span> <span class="name">radius</span>: <span class="number">4</span>
+        property <span class="type">point</span> <span class="name">initialImpulse</span>: <span class="name">Qt</span>.<span class="name">point</span>(<span class="number">0</span>, <span class="number">0</span>)
+        property <span class="type">Team</span> <span class="name">team</span>
+
+        <span class="type">CircleCollider</span> {
+                <span class="name">id</span>: <span class="name">collider</span>
+                <span class="comment">// ...</span>
+                <span class="name">linearDamping</span>: <span class="number">0.1</span> <span class="comment">// make the bullet slow down overtime</span>
+                <span class="name">categories</span>: <span class="name">team</span>.<span class="name">bulletCategory</span>
+                <span class="name">collidesWith</span>: <span class="name">team</span>.<span class="name">bulletCollisionCategories</span>
+                <span class="comment">// ...</span>
+        }
+
+        <span class="comment">// ...</span>
+}</pre>
+<p>And finally we add a <code translate="no">shoot</code> function to the <code translate="no">Player</code> entity. Here we first calculate the direction, which is vector from the player position to the position of the crosshair (which is at the mouse cursor). After we've got the direction, we normalize it, scale it by the impulse constant and finally use the <code translate="no">createEntityFromUrlWithProperties</code> method of the <code translate="no">entityManager</code> to create an entity while passing the initial values for the properties we are interested in.</p>
+<p><b>Note that when creating a new bullet we pass the same <code translate="no">team</code> the player has, to the bullet.</b></p>
+<pre class="qml" translate="no"><span class="type">Player</span> {
+        <span class="name">id</span>: <span class="name">player</span>
+
+        <span class="comment">// ...</span>
+
+        <span class="keyword">function</span> <span class="name">shoot</span>() {
+                let directionX = <span class="name">crosshair</span>.<span class="name">x</span> <span class="operator">-</span> <span class="name">player</span>.<span class="name">x</span>
+                let directionY = <span class="name">crosshair</span>.<span class="name">y</span> <span class="operator">-</span> <span class="name">player</span>.<span class="name">y</span>
+
+                let directionLength = <span class="name">Math</span>.<span class="name">sqrt</span>(<span class="name">directionX</span> <span class="operator">*</span> <span class="name">directionX</span> <span class="operator">+</span> <span class="name">directionY</span> <span class="operator">*</span> <span class="name">directionY</span>)
+                <span class="keyword">if</span> (<span class="name">directionLength</span> <span class="operator">&lt;=</span> <span class="number">0.0001</span>) {
+                        <span class="comment">// The mouse cursor is almost exactly at the middle of the player, thus there is a chace</span>
+                        <span class="comment">// of a division by zero.</span>
+                        <span class="keyword">return</span>;
+                }
+
+                <span class="name">directionX</span> <span class="operator">/=</span> <span class="name">directionLength</span>;
+                <span class="name">directionY</span> <span class="operator">/=</span> <span class="name">directionLength</span>;
+
+                let impulse = <span class="number">150</span>;
+
+                <span class="name">entityManager</span>.<span class="name">createEntityFromUrlWithProperties</span>(
+                        <span class="name">Qt</span>.<span class="name">resolvedUrl</span>(<span class="string">&quot;./Bullet.qml&quot;</span>),
+                        {
+                                &quot;x&quot;: <span class="name">player</span>.<span class="name">x</span> <span class="operator">+</span> <span class="name">sprite</span>.<span class="name">width</span> <span class="operator">*</span> <span class="number">0.5</span>,
+                                &quot;y&quot;: <span class="name">player</span>.<span class="name">y</span> <span class="operator">+</span> <span class="name">sprite</span>.<span class="name">height</span> <span class="operator">*</span> <span class="number">0.5</span>,
+                                &quot;initialImpulse&quot;: <span class="name">Qt</span>.<span class="name">point</span>(<span class="name">directionX</span> <span class="operator">*</span> <span class="name">impulse</span>, <span class="name">directionY</span> <span class="operator">*</span> <span class="name">impulse</span>),
+                                &quot;team&quot;: <span class="name">player</span>.<span class="name">team</span>
+                        }
+                );
+        }
+}</pre>
+<p>To quickly test how everything works we can temporaly call <code translate="no">shoot</code> whenever we get the <code translate="no">pressed</code> signal in the <code translate="no">mouseArea</code>:</p>
+<pre class="qml" translate="no"><span class="type">MouseArea</span> {
+        <span class="name">id</span>: <span class="name">mouseArea</span>
+        <span class="name">enabled</span>: <span class="number">true</span>
+        <span class="comment">// ...</span>
+        <span class="name">onPressed</span>: (<span class="keyword"></span>event) =&gt; {
+                <span class="name">player</span>.<span class="name">shoot</span>();
+        }
+        <span class="comment">// ...</span>
+}</pre>
+<p>This is not exactly what we initially intended, but we can quickly see how everything works. Right now <code translate="no">shoot</code> will only be called when the butten gets pressed, so you will need to press it multiple times to shoot many bullets.</p>
+<p>Now that we've verify that it works, we can finish this features. The goal was to able to press and hold to shoot bullets continuosly. For that we will add a <code translate="no">Timer</code> to our player. The timer will periodically call the <code translate="no">shoot</code> function. And we will control it (enable or disable) whenever we get <code translate="no">pressed</code> or <code translate="no">released</code> signals from the <code translate="no">mouseArea</code>.</p>
+<pre class="qml" translate="no"><span class="type">Player</span> {
+        <span class="comment">// ...</span>
+        property <span class="type">int</span> <span class="name">shootInterval</span>: <span class="number">200</span>
+        <span class="comment">// ...</span>
+        <span class="type">Timer</span> {
+                <span class="name">id</span>: <span class="name">shootTimer</span>
+                <span class="name">repeat</span>: <span class="number">true</span>
+                <span class="name">running</span>: <span class="number">false</span>
+                <span class="name">interval</span>: <span class="name">shootInterval</span>
+                <span class="name">onTriggered</span>: {
+                        <span class="name">shoot</span>();
+                }
+        }
+
+        <span class="keyword">function</span> <span class="name">startShooting</span>() {
+                <span class="name">shootTimer</span>.<span class="name">restart</span>();
+        }
+
+        <span class="keyword">function</span> <span class="name">stopShooting</span>() {
+                <span class="name">shootTimer</span>.<span class="name">running</span> <span class="operator">=</span> <span class="number">false</span>;
+        }
+
+        <span class="keyword">function</span> <span class="name">shoot</span>() {
+                <span class="comment">// ...</span>
+        }
+}</pre>
+<p>And in the <code translate="no">mouseArea</code> signal handlers we will call the new <code translate="no">startShooting</code> and <code translate="no">stopShooting</code> functions:</p>
+<pre class="qml" translate="no"><span class="type">MouseArea</span> {
+        <span class="comment">// ...</span>
+        <span class="name">onPressed</span>: (<span class="keyword"></span>event) =&gt; {
+                <span class="name">player</span>.<span class="name">startShooting</span>();
+        }
+        <span class="name">onReleased</span>: (<span class="keyword"></span>event) =&gt; {
+                <span class="name">player</span>.<span class="name">stopShooting</span>();
+        }
+}</pre>
+<p>And that is pretty much it, for this mechanic.</p>
 </div>
 <!-- @@@tutorial.html -->
 </body>

@@ -382,7 +382,7 @@
 
 	\image {levelColliders.png} {Level Colliders}
 
-	Then we add it to out scene and also set \c{z} to some negative value, so that is appears under
+	Then we add it to our scene and also set \c{z} to some negative value, so that is appears under
 	everything in the scene:
 
 	\qml
@@ -582,4 +582,219 @@
 
 	Now if you try running the game, you will see that ... nothing has changed. However, we are
 	already a step closer to making the player shoot bullets.
+
+	\section3 Shooting Bullets
+
+	To shoot the player will have to press and hold the \c{Left Mouse Button}. To handle this, we
+	will need to add a \c{MouseArea} to our scene:
+
+	\qml
+	MouseArea {
+		id: mouseArea
+		enabled: true
+		// Cover the whole scene
+		anchors.fill: scene
+		// Make sure mouse hover event is reported, even if non of the mouse buttons were
+		// pressed/released.
+		hoverEnabled: true
+		// Hide the cursor. We will have a custom crosshair sprite instead.
+		cursorShape: "BlankCursor"
+		onPositionChanged: (event) => {
+			// handle mouse movement
+		}
+		onPressed: (event) => {
+			// start shooting
+		}
+		onReleased: (event) => {
+			// stop shooting
+		}
+	}
+	\endqml
+
+	We will also add a crosshair to our scene. For now it will just be a white rectangle. Here we
+	bind \c{x} and \c{y} to \c{mouseArea.mouseX} and \c{mouseArea.mouseY}, to make it follow the
+	cursor:
+
+	\qml
+	Rectangle {
+		id: crosshair
+		x: mouseArea.mouseX
+		y: mouseArea.mouseY
+		width: 8
+		height: 8
+	}
+	\endqml
+
+	Now we will go back to \c{Player.qml} here we will need to reference the crosshair by adding a
+	new property on the player:
+
+	\qml
+	EntityBase {
+		id: player
+
+		// ...
+
+		property bool isMovingUp
+		property bool isMovingDown
+		property Item crosshair
+
+		// ...
+	}
+	\endqml
+
+	And assing it in the scene:
+
+	\qml
+	Player {
+		id: player
+		// ...
+		crosshair: crosshair
+		// ...
+	}
+	\endqml
+
+	One last think to take care of, is that we need to add a reference to the \c{Team} instance in
+	the \c{Bullet} entity. From that \c{Team} instance we will use earlier described
+	\c{bulletCategory} and \c{bulletCollisionCategories}.
+
+	\qml
+	import QtQuick
+	import Felgo
+	import "../components"
+
+	EntityBase {
+		id: bullet
+		entityId: "entity"
+		entityType: "bullet"
+
+		property int radius: 4
+		property point initialImpulse: Qt.point(0, 0)
+		property Team team
+
+		CircleCollider {
+			id: collider
+			// ...
+			linearDamping: 0.1 // make the bullet slow down overtime
+			categories: team.bulletCategory
+			collidesWith: team.bulletCollisionCategories
+			// ...
+		}
+
+		// ...
+	}
+	\endqml
+
+	And finally we add a \c{shoot} function to the \c{Player} entity. Here we first calculate the
+	direction, which is vector from the player position to the position of the crosshair (which is
+	at the mouse cursor). After we've got the direction, we normalize it, scale it by the impulse
+	constant and finally use the \c{createEntityFromUrlWithProperties} method of the
+	\c{entityManager} to create an entity while passing the initial values for the properties we are
+	interested in.
+
+	\b{Note that when creating a new bullet we pass the same \c{team} the player has, to the bullet.}
+
+	\qml
+	Player {
+		id: player
+
+		// ...
+
+		function shoot() {
+			let directionX = crosshair.x - player.x
+			let directionY = crosshair.y - player.y
+
+			let directionLength = Math.sqrt(directionX * directionX + directionY * directionY)
+			if (directionLength <= 0.0001) {
+				// The mouse cursor is almost exactly at the middle of the player, thus there is a chace
+				// of a division by zero.
+				return;
+			}
+
+			directionX /= directionLength;
+			directionY /= directionLength;
+
+			let impulse = 150;
+
+			entityManager.createEntityFromUrlWithProperties(
+				Qt.resolvedUrl("./Bullet.qml"),
+				{
+					"x": player.x + sprite.width * 0.5,
+					"y": player.y + sprite.height * 0.5,
+					"initialImpulse": Qt.point(directionX * impulse, directionY * impulse),
+					"team": player.team
+				}
+			);
+		}
+	}
+	\endqml
+
+	To quickly test how everything works we can temporaly call \c{shoot} whenever we get the
+	\c{pressed} signal in the \c{mouseArea}:
+
+	\qml
+	MouseArea {
+		id: mouseArea
+		enabled: true
+		// ...
+		onPressed: (event) => {
+			player.shoot();
+		}
+		// ...
+	}
+	\endqml
+
+	This is not exactly what we initially intended, but we can quickly see how everything works.
+	Right now \c{shoot} will only be called when the butten gets pressed, so you will need to press
+	it multiple times to shoot many bullets.
+
+	Now that we've verify that it works, we can finish this features. The goal was to able to press
+	and hold to shoot bullets continuosly. For that we will add a \c{Timer} to our player. The timer 
+	will periodically call the \c{shoot} function. And we will control it (enable or disable)
+	whenever we get \c{pressed} or \c{released} signals from the \c{mouseArea}.
+
+	\qml
+	Player {
+		// ...
+		property int shootInterval: 200
+		// ...
+		Timer {
+			id: shootTimer
+			repeat: true
+			running: false
+			interval: shootInterval
+			onTriggered: {
+				shoot();
+			}
+		}
+
+		function startShooting() {
+			shootTimer.restart();
+		}
+
+		function stopShooting() {
+			shootTimer.running = false;
+		}
+
+		function shoot() {
+			// ...
+		}
+	}
+	\endqml
+
+	And in the \c{mouseArea} signal handlers we will call the new \c{startShooting} and
+	\c{stopShooting} functions:
+
+	\qml
+	MouseArea {
+		// ...
+		onPressed: (event) => {
+			player.startShooting();
+		}
+		onReleased: (event) => {
+			player.stopShooting();
+		}
+	}
+	\endqml
+
+	And that is pretty much it, for this mechanic.
 */
