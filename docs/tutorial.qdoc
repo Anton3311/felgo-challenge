@@ -457,4 +457,129 @@
 		}
 	}
 	\endqml
+
+	\section3 Team Component
+
+	Before we go and implement shooting, we have one more thing to take care of. We want the same 
+	\c{Bullet} entity to be reusable and sharable between both the \c{Player} and the enemies.
+
+	That means the bullet also has to act differently, based on which entity created it. For
+	example, if the bullet was created by the player, we want it to only collide with the walls and
+	the enemies. If the player were to somehow shoot themselfs, the bullet should simply ignore the
+	player. The same is for the enemies.
+
+	To solve this, we will introduce our first component. This won't be an \c{EntityBase}, rather a
+	simple \c{Item} and it will live in the \c{qml/components/} directory.
+
+	This component will be called \c{Team}.
+
+	The idea here, is for example the player and its bullet will belong to the same team and entites
+	on the same team will completely ignore each other (they won't collide, they won't apply
+	damage).
+
+	The code for it looks like this:
+
+	\qml
+	Item {
+		// The name of the team, only needed in case of debugging
+		property string debugName
+
+		// The category for entities of this team.
+		property int entityCategory
+		// Categories of entities members of this team are allowed to collide with.
+		property int entityCollisionCategories
+
+		// The collision category for bullets.
+		property int bulletCategory
+		// The mask of collision categories the bullets are allowed to collide with.
+		property int bulletCollisionCategories
+	}
+	\endqml
+
+	Another key factor is that we will only have two instances of this \c{Team} component, placed in
+	the scene. And all of the entities will reference them.
+
+	Now we can add both teams to our scene:
+
+	\qml
+	Team {
+		id: playerTeam
+		debugName: "player"
+		entityCategory: Fixture.Category2
+
+		// The player can collide:
+		// 1. level walls
+		// 2. with other players (in case there are many of them)
+		// 3. bullets
+		entityCollisionCategories: levelBackground.wallCategory
+			| Fixture.Category2
+			| Fixture.Category4
+		bulletCategory: Fixture.Category4
+
+		// Don't include `entityCategory` (`Fixture.Category2`) in the collision mask, so that
+		// the player doesn't collide with its own bullets.
+		bulletCollisionCategories: levelBackground.wallCategory | Fixture.Category3
+	}
+	\endqml
+
+	\qml
+	Team {
+		id: enemyTeam
+		debugName: "enemies"
+		entityCategory: Fixture.Category3
+		// Enemies can collide:
+		// 1. level walls
+		// 2. with other enemies
+		// 3. bullets
+		entityCollisionCategories: levelBackground.wallCategory
+			| Fixture.Category3
+			| Fixture.Category4
+		bulletCategory: Fixture.Category4
+
+		// Don't include `Fixture.Category3` which is an `entityCategory`, to make sure that the
+		// bullets created by enemies, don't collide with other enemies, as well as, the one
+		// that created them
+		bulletCollisionCategories: levelBackground.wallCategory | Fixture.Category2
+	}
+	\endqml
+
+	Now we will need to go update the player collider, like this:
+	\qml
+	EntityBase {
+		// ...
+
+		property Team team
+
+		// ...
+
+		CircleCollider {
+			id: collider
+
+			// ...
+
+			categories: team.entityCategory
+			collidesWith: team.entityCollisionCategories
+
+			// ...
+		}
+
+		// ...
+	}
+	\endqml
+
+	And back in our scene, we need to pass the corresponding team instance to the player:
+
+	\qml
+	Player {
+		id: player
+		team: playerTeam
+		// ...
+	}
+	\endqml
+
+	Also don't forget to and the \c{import "../components"} in the \c{Player.qml} and
+	\c{import "./components"} in the scene file.
+
+	Now if you try running the game, you will see that ... nothing has changed. However, we are
+	already a step closer to making the player shoot bullets.
 */

@@ -17,6 +17,7 @@
 <li class="level1"><a href="#player-controls">Player Controls</a></li>
 <li class="level1"><a href="#level">Level</a></li>
 <li class="level1"><a href="#bullets-and-shooting">Bullets and Shooting</a></li>
+<li class="level3"><a href="#team-component">Team Component</a></li>
 </ul>
 </div>
 <div class="sidebar-content" id="sidebar-content"></div></div>
@@ -355,6 +356,94 @@ import Felgo
                 <span class="name">collider</span>.<span class="name">applyLinearImpulse</span>(<span class="name">initialImpulse</span>, <span class="name">collider</span>.<span class="name">body</span>.<span class="name">getWorldCenter</span>())
         }
 }</pre>
+<h4 id="team-component">Team Component</h4>
+<p>Before we go and implement shooting, we have one more thing to take care of. We want the same <code translate="no">Bullet</code> entity to be reusable and sharable between both the <code translate="no">Player</code> and the enemies.</p>
+<p>That means the bullet also has to act differently, based on which entity created it. For example, if the bullet was created by the player, we want it to only collide with the walls and the enemies. If the player were to somehow shoot themselfs, the bullet should simply ignore the player. The same is for the enemies.</p>
+<p>To solve this, we will introduce our first component. This won't be an <code translate="no">EntityBase</code>, rather a simple <code translate="no">Item</code> and it will live in the <code translate="no">qml/components/</code> directory.</p>
+<p>This component will be called <code translate="no">Team</code>.</p>
+<p>The idea here, is for example the player and its bullet will belong to the same team and entites on the same team will completely ignore each other (they won't collide, they won't apply damage).</p>
+<p>The code for it looks like this:</p>
+<pre class="qml" translate="no"><span class="type">Item</span> {
+        <span class="comment">// The name of the team, only needed in case of debugging</span>
+        property <span class="type">string</span> <span class="name">debugName</span>
+
+        <span class="comment">// The category for entities of this team.</span>
+        property <span class="type">int</span> <span class="name">entityCategory</span>
+        <span class="comment">// Categories of entities members of this team are allowed to collide with.</span>
+        property <span class="type">int</span> <span class="name">entityCollisionCategories</span>
+
+        <span class="comment">// The collision category for bullets.</span>
+        property <span class="type">int</span> <span class="name">bulletCategory</span>
+        <span class="comment">// The mask of collision categories the bullets are allowed to collide with.</span>
+        property <span class="type">int</span> <span class="name">bulletCollisionCategories</span>
+}</pre>
+<p>Another key factor is that we will only have two instances of this <code translate="no">Team</code> component, placed in the scene. And all of the entities will reference them.</p>
+<p>Now we can add both teams to our scene:</p>
+<pre class="qml" translate="no"><span class="type">Team</span> {
+        <span class="name">id</span>: <span class="name">playerTeam</span>
+        <span class="name">debugName</span>: <span class="string">&quot;player&quot;</span>
+        <span class="name">entityCategory</span>: <span class="name">Fixture</span>.<span class="name">Category2</span>
+
+        <span class="comment">// The player can collide:</span>
+        <span class="comment">// 1. level walls</span>
+        <span class="comment">// 2. with other players (in case there are many of them)</span>
+        <span class="comment">// 3. bullets</span>
+        <span class="name">entityCollisionCategories</span>: <span class="name">levelBackground</span>.<span class="name">wallCategory</span>
+                <span class="operator">|</span> <span class="name">Fixture</span>.<span class="name">Category2</span>
+                <span class="operator">|</span> <span class="name">Fixture</span>.<span class="name">Category4</span>
+        <span class="name">bulletCategory</span>: <span class="name">Fixture</span>.<span class="name">Category4</span>
+
+        <span class="comment">// Don't include `entityCategory` (`Fixture.Category2`) in the collision mask, so that</span>
+        <span class="comment">// the player doesn't collide with its own bullets.</span>
+        <span class="name">bulletCollisionCategories</span>: <span class="name">levelBackground</span>.<span class="name">wallCategory</span> <span class="operator">|</span> <span class="name">Fixture</span>.<span class="name">Category3</span>
+}</pre>
+<pre class="qml" translate="no"><span class="type">Team</span> {
+        <span class="name">id</span>: <span class="name">enemyTeam</span>
+        <span class="name">debugName</span>: <span class="string">&quot;enemies&quot;</span>
+        <span class="name">entityCategory</span>: <span class="name">Fixture</span>.<span class="name">Category3</span>
+        <span class="comment">// Enemies can collide:</span>
+        <span class="comment">// 1. level walls</span>
+        <span class="comment">// 2. with other enemies</span>
+        <span class="comment">// 3. bullets</span>
+        <span class="name">entityCollisionCategories</span>: <span class="name">levelBackground</span>.<span class="name">wallCategory</span>
+                <span class="operator">|</span> <span class="name">Fixture</span>.<span class="name">Category3</span>
+                <span class="operator">|</span> <span class="name">Fixture</span>.<span class="name">Category4</span>
+        <span class="name">bulletCategory</span>: <span class="name">Fixture</span>.<span class="name">Category4</span>
+
+        <span class="comment">// Don't include `Fixture.Category3` which is an `entityCategory`, to make sure that the</span>
+        <span class="comment">// bullets created by enemies, don't collide with other enemies, as well as, the one</span>
+        <span class="comment">// that created them</span>
+        <span class="name">bulletCollisionCategories</span>: <span class="name">levelBackground</span>.<span class="name">wallCategory</span> <span class="operator">|</span> <span class="name">Fixture</span>.<span class="name">Category2</span>
+}</pre>
+<p>Now we will need to go update the player collider, like this:</p>
+<pre class="qml" translate="no"><span class="type">EntityBase</span> {
+        <span class="comment">// ...</span>
+
+        property <span class="type">Team</span> <span class="name">team</span>
+
+        <span class="comment">// ...</span>
+
+        <span class="type">CircleCollider</span> {
+                <span class="name">id</span>: <span class="name">collider</span>
+
+                <span class="comment">// ...</span>
+
+                <span class="name">categories</span>: <span class="name">team</span>.<span class="name">entityCategory</span>
+                <span class="name">collidesWith</span>: <span class="name">team</span>.<span class="name">entityCollisionCategories</span>
+
+                <span class="comment">// ...</span>
+        }
+
+        <span class="comment">// ...</span>
+}</pre>
+<p>And back in our scene, we need to pass the corresponding team instance to the player:</p>
+<pre class="qml" translate="no"><span class="type">Player</span> {
+        <span class="name">id</span>: <span class="name">player</span>
+        <span class="name">team</span>: <span class="name">playerTeam</span>
+        <span class="comment">// ...</span>
+}</pre>
+<p>Also don't forget to and the <code translate="no">import &quot;../components&quot;</code> in the <code translate="no">Player.qml</code> and <code translate="no">import &quot;./components&quot;</code> in the scene file.</p>
+<p>Now if you try running the game, you will see that ... nothing has changed. However, we are already a step closer to making the player shoot bullets.</p>
 </div>
 <!-- @@@tutorial.html -->
 </body>

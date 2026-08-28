@@ -20,7 +20,8 @@ pre, code {
 }
 
 body {
-	justify-self: center;
+	margin: 0 auto;
+	padding: 1em;
 	max-width: 900px;
 }
 
