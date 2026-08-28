@@ -4,6 +4,7 @@ description = Bullet Hell Game Tutirial using Felgo
 outputdir = ./html
 outputformats = HTML
 
+imagedirs = template/images/
 sourcedirs = .
 sources = ./tutorial.qdoc
 

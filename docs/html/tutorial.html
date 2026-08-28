@@ -15,6 +15,7 @@
 <li class="level1"><a href="#assets">Assets</a></li>
 <li class="level1"><a href="#project-setup">Project Setup</a></li>
 <li class="level1"><a href="#player-controls">Player Controls</a></li>
+<li class="level1"><a href="#level">Level</a></li>
 </ul>
 </div>
 <div class="sidebar-content" id="sidebar-content"></div></div>
@@ -232,6 +233,87 @@ Player {
         id: player
 }</pre>
 <p>At this point the player should be able to move around the screen.</p>
+<h2 id="level">Level</h2>
+<p>Now that we have a moving player, we can add level for the player to move around. Here we will with a rather simple design, the whole level wil be a square-shaped arena.</p>
+<p>The whole level will be its own entity and is built out of tiles from the asset pack.</p>
+<p>The code for it rather straightforward:</p>
+<pre class="qml" translate="no">import QtQuick
+import Felgo
+
+<span class="type">Item</span> {
+        property <span class="type">int</span> <span class="name">levelSize</span>: <span class="number">176</span> <span class="operator">*</span> <span class="number">2</span>
+        property <span class="type">int</span> <span class="name">wallThickness</span>: <span class="number">30</span>
+        property <span class="type">int</span> <span class="name">wallCategory</span>: <span class="name">Fixture</span>.<span class="name">Category1</span>
+
+        property <span class="type">alias</span> <span class="name">levelWalls</span>: <span class="name">walls</span>
+
+        <span class="comment">// Fill the whole screen with a solid color matching the borders of the background sprite</span>
+        <span class="type">Rectangle</span> {
+                <span class="name">anchors</span>.fill: <span class="name">parent</span>
+                <span class="name">color</span>: <span class="string">&quot;#763b36&quot;</span>
+        }
+
+        <span class="type">EntityBase</span> {
+                <span class="comment">// Display the level background below everything</span>
+                <span class="name">id</span>: <span class="name">walls</span>
+                <span class="name">width</span>: <span class="name">levelSize</span>
+                <span class="name">height</span>: <span class="name">levelSize</span>
+                <span class="name">anchors</span>.centerIn: <span class="name">parent</span>
+
+                <span class="comment">// Top</span>
+                <span class="type">BoxCollider</span> {
+                        <span class="comment">// Move the top one down a bit, so that it covers the top wall</span>
+                        <span class="name">y</span>: <span class="number">16</span>
+                        <span class="name">width</span>: <span class="name">parent</span>.<span class="name">width</span>; <span class="name">height</span>: <span class="name">wallThickness</span>
+                        <span class="name">bodyType</span>: <span class="name">Body</span>.<span class="name">Static</span>
+                        <span class="name">categories</span>: <span class="name">wallCategory</span>
+                }
+
+                <span class="comment">// Down</span>
+                <span class="type">BoxCollider</span> {
+                        <span class="name">y</span>: <span class="name">levelSize</span> <span class="operator">-</span> <span class="name">wallThickness</span>
+                        <span class="name">width</span>: <span class="name">parent</span>.<span class="name">width</span>; <span class="name">height</span>: <span class="name">wallThickness</span>
+                        <span class="name">bodyType</span>: <span class="name">Body</span>.<span class="name">Static</span>
+                        <span class="name">categories</span>: <span class="name">wallCategory</span>
+                }
+
+                <span class="comment">// Left</span>
+                <span class="type">BoxCollider</span> {
+                        <span class="name">width</span>: <span class="name">wallThickness</span>; <span class="name">height</span>: <span class="name">levelSize</span>
+                        <span class="name">bodyType</span>: <span class="name">Body</span>.<span class="name">Static</span>
+                        <span class="name">categories</span>: <span class="name">wallCategory</span>
+                }
+
+                <span class="comment">// Right</span>
+                <span class="type">BoxCollider</span> {
+                        <span class="name">x</span>: <span class="name">levelSize</span> <span class="operator">-</span> <span class="name">wallThickness</span>
+                        <span class="name">width</span>: <span class="name">wallThickness</span>; <span class="name">height</span>: <span class="name">levelSize</span>
+                        <span class="name">bodyType</span>: <span class="name">Body</span>.<span class="name">Static</span>
+                        <span class="name">categories</span>: <span class="name">wallCategory</span>
+                }
+
+                <span class="type">Image</span> {
+                        <span class="name">smooth</span>: <span class="number">false</span>
+                        <span class="name">width</span>: <span class="name">levelSize</span>
+                        <span class="name">height</span>: <span class="name">levelSize</span>
+                        <span class="name">source</span>: <span class="name">Qt</span>.<span class="name">resolvedUrl</span>(<span class="string">&quot;../../assets/entities/levelBackground.png&quot;</span>)
+                }
+        }
+}</pre>
+<p>The colliders here a placed to match where the walls are in the background sprite. If you set <code translate="no">debugDrawVisible</code> to <code translate="no">true</code> in the <code translate="no">PhysicsWorld</code> you will see the next picture:</p>
+<p class="centerAlign"><img src="images/levelColliders.png" alt="{Level Colliders}" /></p><p>Then we add it to out scene and also set <code translate="no">z</code> to some negative value, so that is appears under everything in the scene:</p>
+<pre class="qml" translate="no"><span class="type">LevelBackground</span> {
+        <span class="name">id</span>: <span class="name">levelBackground</span>
+        <span class="name">z</span>: -<span class="number">100</span>
+        <span class="name">anchors</span>.fill: <span class="name">scene</span>
+}</pre>
+<p>Now, if you run the game, you will notice, that the player is stuck outside of the level. To fix this, we will change the default <code translate="no">Player</code> position to be roughly in the middle of the level:</p>
+<pre class="qml" translate="no"><span class="type">Player</span> {
+        <span class="name">id</span>: <span class="name">player</span>
+        <span class="name">x</span>: <span class="name">levelWalls</span>.<span class="name">x</span> <span class="operator">+</span> <span class="name">levelBackground</span>.<span class="name">levelSize</span> <span class="operator">/</span> <span class="number">2</span>
+        <span class="name">y</span>: <span class="name">levelWalls</span>.<span class="name">y</span> <span class="operator">+</span> <span class="name">levelBackground</span>.<span class="name">levelSize</span> <span class="operator">/</span> <span class="number">4</span> <span class="operator">*</span> <span class="number">3</span>
+}</pre>
+<p>And now, were done with the level part and can move onto other parts of the game.</p>
 </div>
 <!-- @@@tutorial.html -->
 </body>
