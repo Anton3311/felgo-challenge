@@ -157,6 +157,7 @@ Scene {
 		enabled: true
 		anchors.fill: scene
 		hoverEnabled: true
+		cursorShape: "BlankCursor"
 		onPositionChanged: (event) => {
 			crosshair.x = event.x - crosshair.width / 2;
 			crosshair.y = event.y - crosshair.height / 2;
