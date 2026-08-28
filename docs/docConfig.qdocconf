@@ -6,3 +6,6 @@ outputformats = HTML
 
 sourcedirs = .
 sources = ./tutorial.qdoc
+
+HTML.headerstyles = "<link rel=\"stylesheet\" type=\"text/css\" href=\"style/style.css\" \>\n"
+HTML.stylesheets = template/style/style.css

@@ -4,6 +4,7 @@
   <meta charset="utf-8">
 <!-- tutorial.qdoc -->
   <title>Bullet Hell Game Tutorial using Felgo | Tutorial</title>
+<link rel="stylesheet" type="text/css" href="style/style.css" >
 </head>
 <body>
 <div class="sidebar">
@@ -224,12 +225,13 @@ function updateMovementAxis() {
         <span class="comment">// Expose the controller to an outside world</span>
         property alias controller: axisController
         <span class="operator">.</span><span class="operator">.</span><span class="operator">.</span></pre>
-<p>And forward the events:</p>
+<p>And forward the events by adding this code in our <code translate="no">Main.qml</code>:</p>
 <pre class="cpp" translate="no">Keys<span class="operator">.</span>forwardTo: <span class="operator">[</span>player<span class="operator">.</span>controller<span class="operator">]</span>
 
 Player {
         id: player
 }</pre>
+<p>At this point the player should be able to move around the screen.</p>
 </div>
 <!-- @@@tutorial.html -->
 </body>
