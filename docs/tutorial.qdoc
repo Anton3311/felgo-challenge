@@ -21,7 +21,7 @@
 	\section1 Project Setup
 
 	Start by creating a new \b{Felgo Games} project in Qt Creator. Sepcifically we will need
-	\b{New - Empty Felgo Project} template. The created project will already contain some example code in the \c{Main.qml}, which we will reduce down to these 15:
+	\b{New - Empty Felgo Project} template. The created project will already contain some example code in the \c{Main.qml}, which we will reduce down to these 15 lines:
 
 	\qml
 	import Felgo 4.0
@@ -406,4 +406,55 @@
 
 	And now, were done with the level part and can move onto other parts of the game.
 
+	\section1 Bullets and Shooting
+	
+	Now the fun part. Here we will finaly start adding bullets, because a bullet hell game without
+	the bullets and bullet patterns isn't a bullet hell.
+
+	In this part, we will design reusable components for us to later be able to implement different
+	bullet patterns for the enemies. For example, some of the patterns, we will have at the end look like this:
+
+	\image {bulletPattern1.png} {Bullet Pattern Example 1}
+	\image {bulletPattern2.png} {Bullet Pattern Example 2}
+
+	First we will start by creating a new entity. A \c{Bullet}:
+
+	\qml
+	import QtQuick
+	import Felgo
+
+	EntityBase {
+		id: bullet
+		entityId: "entity"
+		entityType: "bullet"
+
+		property int radius: 4
+		property point initialImpulse: Qt.point(0, 0)
+
+		CircleCollider {
+			id: collider
+			radius: bullet.radius
+			bodyType: Body.Dynamic
+			groupIndex: -1 // make sure that bullets never collide with each other
+			linearDamping: 0.1 // make the bullet slow down overtime
+			fixedRotation: true
+			fixture.onBeginContact: (other, normal) => {
+				// On collision with anything - destroy
+				bullet.destroy();
+			}
+
+			Image {
+				smooth: false
+				anchors.centerIn: parent
+				source: Qt.resolvedUrl("../../assets/entities/bullet.png")
+				width: 32
+				height: 32
+			}
+		}
+
+		Component.onCompleted: {
+			collider.applyLinearImpulse(initialImpulse, collider.body.getWorldCenter())
+		}
+	}
+	\endqml
 */
