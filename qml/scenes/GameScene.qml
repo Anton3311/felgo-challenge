@@ -159,7 +159,10 @@ Scene {
 			crosshair.y = event.y - crosshair.height / 2;
 		}
 		onPressed: (event) => {
-			player.shoot();
+			player.startShooting();
+		}
+		onReleased: (event) => {
+			player.stopShooting();
 		}
 	}
 

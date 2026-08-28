@@ -10,6 +10,7 @@ EntityBase {
 
 	property Team team
 	property int speed
+	property int shootInterval: 200
 	property EntityBase crosshair
 	property alias controller: axisController
 	property alias damagable: myDamagable
@@ -127,6 +128,24 @@ EntityBase {
 			axisController.xAxis = dx * deltaScale;
 			axisController.yAxis = dy * deltaScale;
 		}
+	}
+
+	Timer {
+		id: shootTimer
+		repeat: true
+		running: false
+		interval: shootInterval
+		onTriggered: {
+			shoot();
+		}
+	}
+
+	function startShooting() {
+		shootTimer.restart();
+	}
+
+	function stopShooting() {
+		shootTimer.running = false;
 	}
 
 	function shoot() {

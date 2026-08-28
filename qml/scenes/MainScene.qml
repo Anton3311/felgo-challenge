@@ -41,7 +41,7 @@ Scene {
 	Item {
 		id: startListener
 		Keys.onPressed: (event) => {
-			if (event.key == Qt.Key_Space) {
+			if (event.key === Qt.Key_Space) {
 				gameWindow.state = "game"
 			}
 		}
