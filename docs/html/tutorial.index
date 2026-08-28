@@ -8,6 +8,7 @@
             <contents name="project-setup" title="Project Setup" level="1"/>
             <contents name="player-controls" title="Player Controls" level="1"/>
             <contents name="level" title="Level" level="1"/>
+            <contents name="bullets-and-shooting" title="Bullets and Shooting" level="1"/>
         </page>
     </namespace>
 </INDEX>
