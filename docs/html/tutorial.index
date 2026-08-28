@@ -11,6 +11,7 @@
             <contents name="bullets-and-shooting" title="Bullets and Shooting" level="1"/>
             <contents name="team-component" title="Team Component" level="3"/>
             <contents name="shooting-bullets" title="Shooting Bullets" level="3"/>
+            <contents name="damagable-component" title="Damagable Component" level="1"/>
         </page>
     </namespace>
 </INDEX>

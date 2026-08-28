@@ -19,6 +19,7 @@
 <li class="level1"><a href="#bullets-and-shooting">Bullets and Shooting</a></li>
 <li class="level3"><a href="#team-component">Team Component</a></li>
 <li class="level3"><a href="#shooting-bullets">Shooting Bullets</a></li>
+<li class="level1"><a href="#damagable-component">Damagable Component</a></li>
 </ul>
 </div>
 <div class="sidebar-content" id="sidebar-content"></div></div>
@@ -602,7 +603,134 @@ import &quot;../components&quot;
         }
 }</pre>
 <p>And that is pretty much it, for this mechanic.</p>
-</div>
+<h2 id="damagable-component">Damagable Component</h2>
+<p>Before we dive into implementing enemies we need to preapre some more common building blocks. Besides the <code translate="no">Team</code> being common between both the player and the enemies, one more thing they share is health. So here we will add exactly that. Health in our game will be reperesanted/handled by the <code translate="no">Damagable</code> component.</p>
+<p>This a rather simple component and doesn't require much code. It will have a single function for appling damage, and a couple of signals to notify the outside world:</p>
+<pre class="qml" translate="no">import QtQuick
+import Felgo
+
+<span class="comment">// This component implements health tracking + damage handling</span>
+<span class="comment">//</span>
+<span class="comment">// Can be shared by both the player and the enemies</span>
+
+<span class="type">Item</span> {
+        property <span class="type">Team</span> <span class="name">team</span>
+        property <span class="type">int</span> <span class="name">health</span>
+        property <span class="type">int</span> <span class="name">maxHealth</span>
+
+        <span class="name">Component</span>.onCompleted: {
+                <span class="name">health</span> <span class="operator">=</span> <span class="name">maxHealth</span>
+        }
+
+        signal <span class="type">damageApplied</span>(damage: int)
+        signal <span class="type">death</span>
+
+        <span class="keyword">function</span> <span class="name">applyDamage</span>(damage) {
+                <span class="keyword">if</span> (<span class="name">health</span> <span class="operator">==</span> <span class="number">0</span>) {
+                        <span class="comment">// Already dead =&gt; early return here, to avoid emitting `death` signal one more time.</span>
+                        <span class="keyword">return</span>;
+                }
+
+                <span class="comment">// Clamp the damage, so that the health doesn't become negative</span>
+                <span class="comment">//</span>
+                <span class="comment">// Also when reporting damage to the event system, we want to</span>
+                <span class="comment">// send the actual damage amount that was applied</span>
+                <span class="keyword">if</span> (<span class="name">damage</span> <span class="operator">&gt;</span> <span class="name">health</span>) {
+                        <span class="name">damage</span> <span class="operator">=</span> <span class="name">health</span>
+                }
+
+                <span class="keyword">if</span> (<span class="name">damage</span> <span class="operator">&gt;</span> <span class="number">0</span>) {
+                        <span class="name">health</span> <span class="operator">-=</span> <span class="name">damage</span>;
+                        <span class="name">damageApplied</span>(<span class="name">damage</span>);
+                }
+
+                <span class="keyword">if</span> (<span class="name">health</span> <span class="operator">==</span> <span class="number">0</span>) {
+                        <span class="name">death</span>()
+                }
+        }
+}</pre>
+<p>We can add this component to our player, while also exposing it through the <code translate="no">damagable</code> property:</p>
+<pre class="qml" translate="no"><span class="type">Player</span> {
+        <span class="comment">// ...</span>
+        property <span class="type">alias</span> <span class="name">damagable</span>: <span class="name">myDamagable</span>
+
+        <span class="comment">// ...</span>
+
+        <span class="name">Component</span>.onCompleted: {
+                <span class="name">damagable</span>.<span class="name">team</span> <span class="operator">=</span> <span class="name">team</span>
+        }
+
+        <span class="type">Damagable</span> {
+                <span class="name">id</span>: <span class="name">myDamagable</span>
+                <span class="name">maxHealth</span>: <span class="number">6</span>
+        }
+
+        <span class="comment">// ...</span>
+}</pre>
+<p>Now the player has health, however we can't see how much of it is currently left, so we will add a little UI for that. The use will be rather simple and just be a row of either full or empty hearts. Two <code translate="no">Repeater</code>s will be more than enough.</p>
+<p>The first repeater will place <code translate="no">damagable.health</code> number of full hearts and the other one will place <code translate="no">damagable.maxHealth - damagable.health</code> number of empty hearts.</p>
+<p>We start by creating a new file under <code translate="no">qml/ui</code></p>
+<pre class="qml" translate="no">import QtQuick
+import Felgo
+
+import &quot;../components&quot;
+
+<span class="type">Item</span> {
+        <span class="name">id</span>: <span class="name">self</span>
+        property <span class="type">Damagable</span> <span class="name">damagable</span>
+        property <span class="type">url</span> <span class="name">fullHeartImage</span>: <span class="name">Qt</span>.<span class="name">resolvedUrl</span>(<span class="string">&quot;../../assets/entities/heartFull.png&quot;</span>)
+        property <span class="type">url</span> <span class="name">emptyHeartImage</span>: <span class="name">Qt</span>.<span class="name">resolvedUrl</span>(<span class="string">&quot;../../assets/entities/heartEmpty.png&quot;</span>)
+
+        <span class="name">x</span>: <span class="number">0</span>
+        <span class="name">y</span>: <span class="number">0</span>
+        <span class="name">height</span>: <span class="number">16</span>
+        <span class="name">width</span>: <span class="name">parent</span>.<span class="name">width</span>
+
+        <span class="type">Row</span> {
+                <span class="name">width</span>: <span class="name">parent</span>.<span class="name">width</span>
+                <span class="name">height</span>: <span class="name">parent</span>.<span class="name">height</span>
+                <span class="type">Repeater</span> {
+                        <span class="name">model</span>: <span class="name">damagable</span>.<span class="name">health</span>
+                        <span class="type">Image</span> {
+                                <span class="name">source</span>: <span class="name">self</span>.<span class="name">fullHeartImage</span>
+                                <span class="name">fillMode</span>: <span class="name">Image</span>.<span class="name">PreserveAspectCrop</span>
+                                <span class="name">width</span>: <span class="number">32</span>
+                                <span class="name">height</span>: <span class="number">32</span>
+                                <span class="name">smooth</span>: <span class="number">false</span>
+                        }
+                }
+                <span class="type">Repeater</span> {
+                        <span class="name">model</span>: <span class="name">damagable</span>.<span class="name">maxHealth</span> <span class="operator">-</span> <span class="name">damagable</span>.<span class="name">health</span>
+                        <span class="type">Image</span> {
+                                <span class="name">source</span>: <span class="name">self</span>.<span class="name">emptyHeartImage</span>
+                                <span class="name">fillMode</span>: <span class="name">Image</span>.<span class="name">PreserveAspectCrop</span>
+                                <span class="name">width</span>: <span class="number">32</span>
+                                <span class="name">height</span>: <span class="number">32</span>
+                                <span class="name">smooth</span>: <span class="number">false</span>
+                        }
+                }
+        }
+}</pre>
+<p>And finally add it to the scene:</p>
+<pre class="qml" translate="no">import &quot;./ui&quot;
+
+<span class="type">Scene</span> {
+        <span class="comment">// ...</span>
+
+        <span class="type">Player</span> {
+                <span class="comment">// ...</span>
+        }
+
+        <span class="type">MouseArea</span> {
+                <span class="comment">// ...</span>
+        }
+
+        <span class="type">PlayerHealthBar</span> {
+                <span class="name">damagable</span>: <span class="name">player</span>.<span class="name">damagable</span>
+        }
+}</pre>
+<p>After the above changes we reach the next result:</p>
+<p class="centerAlign"><img src="images/playerHealthBar.png" alt="{Player Health Bar}" /></p></div>
 <!-- @@@tutorial.html -->
 </body>
 </html>

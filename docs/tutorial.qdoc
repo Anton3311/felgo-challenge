@@ -797,4 +797,161 @@
 	\endqml
 
 	And that is pretty much it, for this mechanic.
+
+	\section1 Damagable Component
+
+	Before we dive into implementing enemies we need to preapre some more common building blocks.
+	Besides the \c{Team} being common between both the player and the enemies, one more thing they 
+	share is health. So here we will add exactly that. Health in our game will be
+	reperesanted/handled by the \c{Damagable} component.
+
+	This a rather simple component and doesn't require much code. It will have a single function
+	for appling damage, and a couple of signals to notify the outside world:
+
+	\qml
+	import QtQuick
+	import Felgo
+
+	// This component implements health tracking + damage handling
+	//
+	// Can be shared by both the player and the enemies
+	Item {
+		property Team team
+		property int health
+		property int maxHealth
+
+		Component.onCompleted: {
+			health = maxHealth
+		}
+
+		signal damageApplied(damage: int)
+		signal death
+
+		function applyDamage(damage) {
+			if (health == 0) {
+				// Already dead => early return here, to avoid emitting `death` signal one more time.
+				return;
+			}
+
+			// Clamp the damage, so that the health doesn't become negative
+			//
+			// Also when reporting damage to the event system, we want to
+			// send the actual damage amount that was applied
+			if (damage > health) {
+				damage = health
+			}
+
+			if (damage > 0) {
+				health -= damage;
+				damageApplied(damage);
+			}
+
+			if (health == 0) {
+				death()
+			}
+		}
+	}
+	\endqml
+
+	We can add this component to our player, while also exposing it through the \c{damagable}
+	property:
+
+	\qml
+	Player {
+		// ...
+		property alias damagable: myDamagable
+
+		// ...
+
+		Component.onCompleted: {
+			damagable.team = team
+		}
+
+		Damagable {
+			id: myDamagable
+			maxHealth: 6
+		}
+
+		// ...
+	}
+	\endqml
+
+	Now the player has health, however we can't see how much of it is currently left, so we will add
+	a little UI for that. The use will be rather simple and just be a row of either full or empty
+	hearts. Two \c{Repeater}s will be more than enough.
+
+	The first repeater will place \c{damagable.health} number of full hearts and the other one will
+	place \c{damagable.maxHealth - damagable.health} number of empty hearts.
+
+	We start by creating a new file under \c{qml/ui}
+
+	\qml
+	import QtQuick
+	import Felgo
+
+	import "../components"
+
+	Item {
+		id: self
+		property Damagable damagable
+		property url fullHeartImage: Qt.resolvedUrl("../../assets/entities/heartFull.png")
+		property url emptyHeartImage: Qt.resolvedUrl("../../assets/entities/heartEmpty.png")
+
+		x: 0
+		y: 0
+		height: 16
+		width: parent.width
+
+		Row {
+			width: parent.width
+			height: parent.height
+			Repeater {
+				model: damagable.health
+				Image {
+					source: self.fullHeartImage
+					fillMode: Image.PreserveAspectCrop
+					width: 32
+					height: 32
+					smooth: false
+				}
+			}
+			Repeater {
+				model: damagable.maxHealth - damagable.health
+				Image {
+					source: self.emptyHeartImage
+					fillMode: Image.PreserveAspectCrop
+					width: 32
+					height: 32
+					smooth: false
+				}
+			}
+		}
+	}
+	\endqml
+
+	And finally add it to the scene:
+
+	\qml
+	import "./ui"
+
+	Scene {
+		// ...
+
+		Player {
+			// ...
+		}
+
+		MouseArea {
+			// ...
+		}
+
+		PlayerHealthBar {
+			damagable: player.damagable
+		}
+	}
+	\endqml
+
+	After the above changes we reach the next result:
+
+	\image {playerHealthBar.png} {Player Health Bar}
 */
