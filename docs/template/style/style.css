@@ -33,3 +33,13 @@ body {
 img {
 	max-width: 80%;
 }
+
+.pixel-art-tile {
+	width: 100%;
+}
+
+.pixel-art-tile img {
+	width: 128px;
+	height: 128px;
+	image-rendering: crisp-edges;
+}

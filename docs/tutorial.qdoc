@@ -1057,7 +1057,135 @@
 
 	\section1 Enemies
 
+	Now we've reached the last major part of this tutorial and the game: the enemies. In the next
+	sections we won't go into as much of details as in the previos ones, since we already have the
+	majority of building blocks in place, and right now we will mostly need to assemble them.
+
+	As a part of this tutorial we will create a single enemy, which will be a ghost.
+
+	\div {class="pixel-art-tile"}
+		\image {ghost.png} {Ghost}
+	\enddiv
+
 	\section3 Enemy Entity
+
+	We start of as usual by creating a new entity file. The majority of it can be inherited from the
+	\c{Player}, specifically: \c{Damagable}, \c{CircleCollider} and \c{BulletEmitter} (which will
+	come in handy later).
+
+	After taking parts of the player and appling some minor modifications like changing the
+	\c{maxHealth} and the \c{sprite}, and handling \c{death} signal of the \c{Damagable}, we get
+	something like this:
+	
+	\qml
+	import QtQuick
+	import Felgo
+	import "../components"
+
+	EntityBase {
+		id: self
+		entityId: "entity"
+		entityType: "ghost"
+
+		property alias damagable: myDamagable
+		property Team team
+
+		Component.onCompleted: {
+			bulletEmitter.team = team
+			damagable.team = team
+		}
+
+		Damagable {
+			id: myDamagable
+			maxHealth: 4
+			onDeath: {
+				self.destroy();
+			}
+		}
+
+		BulletEmitter {
+			id: bulletEmitter
+			emissionOrigin: self
+			bulletPrefab: Qt.resolvedUrl("./Bullet.qml")
+			emissionOriginOffset: Qt.point(sprite.width * 0.5, sprite.height * 0.5)
+		}
+
+		CircleCollider {
+			id: collider
+			categories: team.entityCategory
+			collidesWith: team.entityCollisionCategories
+			radius: 16
+			fixedRotation: true
+			linearDamping: 1
+
+			Image {
+				id: sprite
+				anchors.centerIn: parent.anchors.center
+				smooth: false
+				source: Qt.resolvedUrl("../../assets/entities/ghost.png")
+				width: 32
+				height: 32
+				mirror: collider.linearVelocity.x < 0
+			}
+		}
+	}
+	\endqml
+
+	And we can quickly add it to the scene:
+
+	\qml
+	Ghost {
+		x: levelBackground.levelWalls.x + levelBackground.levelSize / 2
+		y: levelBackground.levelWalls.y + levelBackground.levelSize / 4
+		team: enemyTeam
+	}
+	\endqml
+
+	Now if you were to launch the game and test the enemy, you will notice that the enemy doesn't
+	seem to recieve any damage and more over seems to be immortal. The reason for that is rather
+	simple: we forgot to implement one tiny but crucial feature of the \c{Bullet}. Right now when a
+	bullet hits an entity it doesn't apply any damage. It simply destroys itself.
+
+	Let's fix that. The fix is pretty straightforward. The one thing we need to keep in mind,
+	is that if the entity and the bullet are on the same \c{Team} we don't apply the damage.
+
+	\qml
+	EntityBase {
+		id: bullet
+		entityId: "entity"
+		entityType: "bullet"
+
+		// ...
+
+		CircleCollider {
+			// ...
+			fixture.onBeginContact: (other, normal) => {
+				let target = other.getBody().target;
+				let damagable = target.damagable;
+
+				// The bullet might have hit some other entity like a wall, that doesn't have a
+				// `Damagable` component.
+				if (damagable !== undefined) {
+					if (damagable.team === bullet.team) {
+						// The entity is one the same => don't apply any damage and don't destroy
+						// itself.
+						return;
+					}
+
+					// To keep it simple apply a hardcoded damage amount. You might, however, want
+					// to make it configurable, if you want to extend the game even further.
+					damagable.applyDamage(1);
+				}
+
+				bullet.destroy();
+			}
+		}
+		
+		// ...
+	}
+	\endqml
+
+	Now we can launch the game and verify that the enemy is indeed no longer immortal.
 
 	\section3 Making Enemies shoot
 

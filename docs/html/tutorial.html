@@ -806,7 +806,104 @@ import Felgo
         }
 }</pre>
 <h2 id="enemies">Enemies</h2>
-<h4 id="enemy-entity">Enemy Entity</h4>
+<p>Now we've reached the last major part of this tutorial and the game: the enemies. In the next sections we won't go into as much of details as in the previos ones, since we already have the majority of building blocks in place, and right now we will mostly need to assemble them.</p>
+<p>As a part of this tutorial we will create a single enemy, which will be a ghost.</p>
+<div class="pixel-art-tile"><p class="centerAlign"><img src="images/ghost.png" alt="{Ghost}" /></p></div><h4 id="enemy-entity">Enemy Entity</h4>
+<p>We start of as usual by creating a new entity file. The majority of it can be inherited from the <code translate="no">Player</code>, specifically: <code translate="no">Damagable</code>, <code translate="no">CircleCollider</code> and <code translate="no">BulletEmitter</code> (which will come in handy later).</p>
+<p>After taking parts of the player and appling some minor modifications like changing the <code translate="no">maxHealth</code> and the <code translate="no">sprite</code>, and handling <code translate="no">death</code> signal of the <code translate="no">Damagable</code>, we get something like this:</p>
+<pre class="qml" translate="no">import QtQuick
+import Felgo
+import &quot;../components&quot;
+
+<span class="type">EntityBase</span> {
+        <span class="name">id</span>: <span class="name">self</span>
+        <span class="name">entityId</span>: <span class="string">&quot;entity&quot;</span>
+        <span class="name">entityType</span>: <span class="string">&quot;ghost&quot;</span>
+
+        property <span class="type">alias</span> <span class="name">damagable</span>: <span class="name">myDamagable</span>
+        property <span class="type">Team</span> <span class="name">team</span>
+
+        <span class="name">Component</span>.onCompleted: {
+                <span class="name">bulletEmitter</span>.<span class="name">team</span> <span class="operator">=</span> <span class="name">team</span>
+                <span class="name">damagable</span>.<span class="name">team</span> <span class="operator">=</span> <span class="name">team</span>
+        }
+
+        <span class="type">Damagable</span> {
+                <span class="name">id</span>: <span class="name">myDamagable</span>
+                <span class="name">maxHealth</span>: <span class="number">4</span>
+                <span class="name">onDeath</span>: {
+                        <span class="name">self</span>.<span class="name">destroy</span>();
+                }
+        }
+
+        <span class="type">BulletEmitter</span> {
+                <span class="name">id</span>: <span class="name">bulletEmitter</span>
+                <span class="name">emissionOrigin</span>: <span class="name">self</span>
+                <span class="name">bulletPrefab</span>: <span class="name">Qt</span>.<span class="name">resolvedUrl</span>(<span class="string">&quot;./Bullet.qml&quot;</span>)
+                <span class="name">emissionOriginOffset</span>: <span class="name">Qt</span>.<span class="name">point</span>(<span class="name">sprite</span>.<span class="name">width</span> <span class="operator">*</span> <span class="number">0.5</span>, <span class="name">sprite</span>.<span class="name">height</span> <span class="operator">*</span> <span class="number">0.5</span>)
+        }
+
+        <span class="type">CircleCollider</span> {
+                <span class="name">id</span>: <span class="name">collider</span>
+                <span class="name">categories</span>: <span class="name">team</span>.<span class="name">entityCategory</span>
+                <span class="name">collidesWith</span>: <span class="name">team</span>.<span class="name">entityCollisionCategories</span>
+                <span class="name">radius</span>: <span class="number">16</span>
+                <span class="name">fixedRotation</span>: <span class="number">true</span>
+                <span class="name">linearDamping</span>: <span class="number">1</span>
+
+                <span class="type">Image</span> {
+                        <span class="name">id</span>: <span class="name">sprite</span>
+                        <span class="name">anchors</span>.centerIn: <span class="name">parent</span>.<span class="name">anchors</span>.<span class="name">center</span>
+                        <span class="name">smooth</span>: <span class="number">false</span>
+                        <span class="name">source</span>: <span class="name">Qt</span>.<span class="name">resolvedUrl</span>(<span class="string">&quot;../../assets/entities/ghost.png&quot;</span>)
+                        <span class="name">width</span>: <span class="number">32</span>
+                        <span class="name">height</span>: <span class="number">32</span>
+                        <span class="name">mirror</span>: <span class="name">collider</span>.<span class="name">linearVelocity</span>.<span class="name">x</span> <span class="operator">&lt;</span> <span class="number">0</span>
+                }
+        }
+}</pre>
+<p>And we can quickly add it to the scene:</p>
+<pre class="qml" translate="no"><span class="type">Ghost</span> {
+        <span class="name">x</span>: <span class="name">levelBackground</span>.<span class="name">levelWalls</span>.<span class="name">x</span> <span class="operator">+</span> <span class="name">levelBackground</span>.<span class="name">levelSize</span> <span class="operator">/</span> <span class="number">2</span>
+        <span class="name">y</span>: <span class="name">levelBackground</span>.<span class="name">levelWalls</span>.<span class="name">y</span> <span class="operator">+</span> <span class="name">levelBackground</span>.<span class="name">levelSize</span> <span class="operator">/</span> <span class="number">4</span>
+        <span class="name">team</span>: <span class="name">enemyTeam</span>
+}</pre>
+<p>Now if you were to launch the game and test the enemy, you will notice that the enemy doesn't seem to recieve any damage and more over seems to be immortal. The reason for that is rather simple: we forgot to implement one tiny but crucial feature of the <code translate="no">Bullet</code>. Right now when a bullet hits an entity it doesn't apply any damage. It simply destroys itself.</p>
+<p>Let's fix that. The fix is pretty straightforward. The one thing we need to keep in mind, is that if the entity and the bullet are on the same <code translate="no">Team</code> we don't apply the damage.</p>
+<pre class="qml" translate="no"><span class="type">EntityBase</span> {
+        <span class="name">id</span>: <span class="name">bullet</span>
+        <span class="name">entityId</span>: <span class="string">&quot;entity&quot;</span>
+        <span class="name">entityType</span>: <span class="string">&quot;bullet&quot;</span>
+
+        <span class="comment">// ...</span>
+
+        <span class="type">CircleCollider</span> {
+                <span class="comment">// ...</span>
+                <span class="name">fixture</span>.onBeginContact: (<span class="keyword"></span>other, normal) =&gt; {
+                        let target = <span class="name">other</span>.<span class="name">getBody</span>().<span class="name">target</span>;
+                        let damagable = <span class="name">target</span>.<span class="name">damagable</span>;
+
+                        <span class="comment">// The bullet might have hit some other entity like a wall, that doesn't have a</span>
+                        <span class="comment">// `Damagable` component.</span>
+                        <span class="keyword">if</span> (<span class="name">damagable</span> <span class="operator">!==</span> <span class="name">undefined</span>) {
+                                <span class="keyword">if</span> (<span class="name">damagable</span>.<span class="name">team</span> <span class="operator">===</span> <span class="name">bullet</span>.<span class="name">team</span>) {
+                                        <span class="comment">// The entity is one the same =&gt; don't apply any damage and don't destroy</span>
+                                        <span class="comment">// itself.</span>
+                                        <span class="keyword">return</span>;
+                                }
+
+                                <span class="comment">// To keep it simple apply a hardcoded damage amount. You might, however, want</span>
+                                <span class="comment">// to make it configurable, if you want to extend the game even further.</span>
+                                <span class="name">damagable</span>.<span class="name">applyDamage</span>(<span class="number">1</span>);
+                        }
+
+                        <span class="name">bullet</span>.<span class="name">destroy</span>();
+                }
+        }
+
+        <span class="comment">// ...</span>
+}</pre>
+<p>Now we can launch the game and verify that the enemy is indeed no longer immortal.</p>
 <h4 id="making-enemies-shoot">Making Enemies shoot</h4>
 <h4 id="enemy-state-machine">Enemy State Machine</h4>
 </div>
