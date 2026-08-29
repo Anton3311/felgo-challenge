@@ -11,11 +11,15 @@ body {
 
 pre {
 	overflow-x: auto;
+	font-size: 0.9em;
+}
+
+code {
+	font-optical-sizing: auto;
 }
 
 pre, code {
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.9em;
 	font-style: normal;
 }
 
