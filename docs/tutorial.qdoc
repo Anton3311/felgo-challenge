@@ -8,7 +8,7 @@
 
 	The tutorial will provide a base for the overall game, enabling anyone to further expand on it.
 	Here we will go in details on how to implement the player controls and shooting mechanics,
-	enemies, their state machines and attack patterns, wave spawning and scene management.
+	enemies, their state machines and attack patterns.
 
 	The source code for the finished project is available on
 	\l {https://github.com/Anton3311/felgo-challenge} {GitHub}
@@ -1497,4 +1497,22 @@
 
 	And these were the final changes, we need to make to get the state machine working. Now we have 
 	a fully working enemy with two state and two distinct attack patterns.
+
+	\section1 Conclusion
+
+	After following this tutorial you will end up with a pretty solid base for a game in a Bullet
+	Hell genre.
+
+	Here we went through implementing player controls, bullet mechanics and shooting, an enemy, its
+	state mchine and attack patterns. Besides that, this tutorial describes how were all the game
+	components were created in way that allows, you to assemble them without much problems to create
+	new entities, enemies and their attack patterns.
+
+	This game, however, still lacks some features, like:
+	\list
+	\li a main menu
+	\li game over and restarting logic
+	\li spawning of waves
+	\li sound effects
+	\endlist
 */

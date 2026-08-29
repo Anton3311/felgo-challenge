@@ -17,6 +17,7 @@
             <contents name="enemy-entity" title="Enemy Entity" level="3"/>
             <contents name="making-enemies-shoot" title="Making Enemies shoot" level="3"/>
             <contents name="enemy-state-machine" title="Enemy State Machine" level="3"/>
+            <contents name="conclusion" title="Conclusion" level="1"/>
         </page>
     </namespace>
 </INDEX>
