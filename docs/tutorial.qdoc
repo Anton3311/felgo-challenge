@@ -417,10 +417,10 @@
 	the bullets and bullet patterns isn't a bullet hell.
 
 	In this part, we will design reusable components for us to later be able to implement different
-	bullet patterns for the enemies. For example, some of the patterns, we will have at the end look like this:
+	bullet patterns for the enemies. For example, some of the patterns we will have at the end look like this:
 
-	\image {bulletPattern1.png} {Bullet Pattern Example 1}
-	\image {bulletPattern2.png} {Bullet Pattern Example 2}
+	\image {ghostAttack1.png} {Bullet Pattern Example 1}
+	\image {ghostAttack2.png} {Bullet Pattern Example 2}
 
 	First we will start by creating a new entity. A \c{Bullet}:
 
