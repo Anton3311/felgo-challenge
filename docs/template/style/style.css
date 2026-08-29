@@ -47,3 +47,13 @@ img {
 	height: 128px;
 	image-rendering: crisp-edges;
 }
+
+/* Code Highlighting */
+pre .comment {
+	color: grey;
+}
+
+pre .keyword, .type, .string {
+	color: green;
+	font-weight: bold;
+}
