@@ -10,18 +10,25 @@
 	Here we will go in details on how to implement the player controls and shooting mechanics,
 	enemies, their state machines and attack patterns, wave spawning and scene management.
 
-	The source code for the finished project is available on \l {https://github.com/Anton3311/felgo-challenge} {GitHub}
+	The source code for the finished project is available on
+	\l {https://github.com/Anton3311/felgo-challenge} {GitHub}
 
 	\section1 Assets
 
-	The art assets used throughout this tutorial are from Kenney and are available \l {https://kenney.nl/assets/tiny-dungeon} {here} under CC0 1.0 License. This asset pack doesn't cover all of the needed art, thus some of the missing pieces were hand-drawn in the same style. All of the used art assets are available in GitHub Repository under \l {https://github.com/Anton3311/felgo-challenge/tree/main/assets/entities} {assets/entities}
+	The art assets used throughout this tutorial are from Kenney and are available
+	\l {https://kenney.nl/assets/tiny-dungeon} {here} under CC0 1.0 License. This asset pack doesn't
+	cover all of the needed art, thus some of the missing pieces were hand-drawn in the same style.
+	All of the used art assets are available in GitHub Repository under
+	\l {https://github.com/Anton3311/felgo-challenge/tree/main/assets/entities} {assets/entities}
 
-	The pixel font used in the game is available on \l {https://fonts.google.com/specimen/Jersey+10?query=Jersey+10&preview.script=Latn} {Google Fonts}
+	The pixel font used in the game is available on
+	\l {https://fonts.google.com/specimen/Jersey+10?query=Jersey+10&preview.script=Latn} {Google Fonts}
 
 	\section1 Project Setup
 
 	Start by creating a new \b{Felgo Games} project in Qt Creator. Sepcifically we will need
-	\b{New - Empty Felgo Project} template. The created project will already contain some example code in the \c{Main.qml}, which we will reduce down to these 15 lines:
+	\b{New - Empty Felgo Project} template. The created project will already contain some example
+	code in the \c{Main.qml}, which we will reduce down to these 15 lines:
 
 	\qml
 	import Felgo 4.0
@@ -954,4 +961,105 @@
 	After the above changes we reach the next result:
 
 	\image {playerHealthBar.png} {Player Health Bar}
+
+	\section1 BulletEmitter Component
+
+	One last thing we have to tackle here, is extracting creation of bullets into its own component.
+
+	This component will be called a \c{BulletEmitter} and will provide some common logic and will
+	make it easier for us to implement different attack patterns.
+
+	The process for adding a new component is already well-known. Here we pretty much want to
+	extract the code we already have in the player entity, into a new place, with some minor
+	adjustments: the bullets will be emitted relative to some "origin" entity. The users of this
+	component will need to provide the initial position of the bullet relative to that origin. In
+	usual cases the origin entity will be the plyaer itself or the enemy.
+
+	Here we have a code snippet extracted from the \c{Player.qml}:
+
+	\qml
+	import QtQuick
+	import Felgo
+
+	Item {
+		id: self
+		property Team team
+		property url bulletPrefab
+		property Item emissionOrigin
+		property point emissionOriginOffset: Qt.point(0, 0)
+
+		// Here `positionX` and `positionY` are local to the `emissionOrigin` entity
+		function emit(positionX, positionY, directionX, directionY, impulse) {
+			let forceVector = Qt.point(directionX * impulse, directionY * impulse)
+
+			entityManager.createEntityFromUrlWithProperties(
+				bulletPrefab,
+				{
+					"x": positionX + self.emissionOrigin.x + self.emissionOriginOffset.x,
+					"y": positionY + self.emissionOrigin.y + self.emissionOriginOffset.y,
+					"initialImpulse": forceVector,
+					"team": self.team
+				}
+			);
+		}
+	}
+	\endqml
+
+	In \c{Player.qml} we can now replace everything related with the \c{BulletEmitter}:
+
+	\qml
+	Player {
+		// ...
+
+		Component.onCompleted: {
+			damagable.team = team
+
+			// The `Bullet`s require a `Team` instance. `BulletEmitter` passes one to every created
+			// bullet.
+			bulletEmitter.team = team
+			// Set the center of the player as the bullet emission origin.
+			bulletEmitter.emissionOrigin = player
+			bulletEmitter.emissionOriginOffset = Qt.point(sprite.width * 0.5, sprite.height * 0.5)
+		}
+
+		// ...
+
+		TwoAxisController {
+			// ...
+		}
+
+		BulletEmitter {
+			id: bulletEmitter
+			bulletPrefab: Qt.resolvedUrl("Bullet.qml")
+		}
+
+		// ...
+	}
+	\endqml
+
+	And in the \c{shoot} function of the \c{Player} we replace
+	\c{entityManager.createEntityFromUrlWithProperties} with \c{bulletEmitter.emit}:
+
+	\qml
+	Player {
+		// ...
+		function shoot() {
+			// ...
+
+			let impulse = 150;
+
+			// Since the origin entity and the offset in `BulletEmitter` are set to the center of
+			// the player, the initial position of the bullet is (0, 0).
+			bulletEmitter.emit(0, 0, directionX, directionY, impulse);
+		}
+	}
+	\endqml
+
+	\section1 Enemies
+
+	\section3 Enemy Entity
+
+	\section3 Making Enemies shoot
+
+	\section3 Enemy State Machine
 */

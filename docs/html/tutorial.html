@@ -20,6 +20,11 @@
 <li class="level3"><a href="#team-component">Team Component</a></li>
 <li class="level3"><a href="#shooting-bullets">Shooting Bullets</a></li>
 <li class="level1"><a href="#damagable-component">Damagable Component</a></li>
+<li class="level1"><a href="#bulletemitter-component">BulletEmitter Component</a></li>
+<li class="level1"><a href="#enemies">Enemies</a></li>
+<li class="level3"><a href="#enemy-entity">Enemy Entity</a></li>
+<li class="level3"><a href="#making-enemies-shoot">Making Enemies shoot</a></li>
+<li class="level3"><a href="#enemy-state-machine">Enemy State Machine</a></li>
 </ul>
 </div>
 <div class="sidebar-content" id="sidebar-content"></div></div>
@@ -612,7 +617,6 @@ import Felgo
 <span class="comment">// This component implements health tracking + damage handling</span>
 <span class="comment">//</span>
 <span class="comment">// Can be shared by both the player and the enemies</span>
-
 <span class="type">Item</span> {
         property <span class="type">Team</span> <span class="name">team</span>
         property <span class="type">int</span> <span class="name">health</span>
@@ -730,7 +734,82 @@ import &quot;../components&quot;
         }
 }</pre>
 <p>After the above changes we reach the next result:</p>
-<p class="centerAlign"><img src="images/playerHealthBar.png" alt="{Player Health Bar}" /></p></div>
+<p class="centerAlign"><img src="images/playerHealthBar.png" alt="{Player Health Bar}" /></p><h2 id="bulletemitter-component">BulletEmitter Component</h2>
+<p>One last thing we have to tackle here, is extracting creation of bullets into its own component.</p>
+<p>This component will be called a <code translate="no">BulletEmitter</code> and will provide some common logic and will make it easier for us to implement different attack patterns.</p>
+<p>The process for adding a new component is already well-known. Here we pretty much want to extract the code we already have in the player entity, into a new place, with some minor adjustments: the bullets will be emitted relative to some &quot;origin&quot; entity. The users of this component will need to provide the initial position of the bullet relative to that origin. In usual cases the origin entity will be the plyaer itself or the enemy.</p>
+<p>Here we have a code snippet extracted from the <code translate="no">Player.qml</code>:</p>
+<pre class="qml" translate="no">import QtQuick
+import Felgo
+
+<span class="type">Item</span> {
+        <span class="name">id</span>: <span class="name">self</span>
+        property <span class="type">Team</span> <span class="name">team</span>
+        property <span class="type">url</span> <span class="name">bulletPrefab</span>
+        property <span class="type">Item</span> <span class="name">emissionOrigin</span>
+        property <span class="type">point</span> <span class="name">emissionOriginOffset</span>: <span class="name">Qt</span>.<span class="name">point</span>(<span class="number">0</span>, <span class="number">0</span>)
+
+        <span class="comment">// Here `positionX` and `positionY` are local to the `emissionOrigin` entity</span>
+        <span class="keyword">function</span> <span class="name">emit</span>(positionX, positionY, directionX, directionY, impulse) {
+                let forceVector = <span class="name">Qt</span>.<span class="name">point</span>(<span class="name">directionX</span> <span class="operator">*</span> <span class="name">impulse</span>, <span class="name">directionY</span> <span class="operator">*</span> <span class="name">impulse</span>)
+
+                <span class="name">entityManager</span>.<span class="name">createEntityFromUrlWithProperties</span>(
+                        <span class="name">bulletPrefab</span>,
+                        {
+                                &quot;x&quot;: <span class="name">positionX</span> <span class="operator">+</span> <span class="name">self</span>.<span class="name">emissionOrigin</span>.<span class="name">x</span> <span class="operator">+</span> <span class="name">self</span>.<span class="name">emissionOriginOffset</span>.<span class="name">x</span>,
+                                &quot;y&quot;: <span class="name">positionY</span> <span class="operator">+</span> <span class="name">self</span>.<span class="name">emissionOrigin</span>.<span class="name">y</span> <span class="operator">+</span> <span class="name">self</span>.<span class="name">emissionOriginOffset</span>.<span class="name">y</span>,
+                                &quot;initialImpulse&quot;: <span class="name">forceVector</span>,
+                                &quot;team&quot;: <span class="name">self</span>.<span class="name">team</span>
+                        }
+                );
+        }
+}</pre>
+<p>In <code translate="no">Player.qml</code> we can now replace everything related with the <code translate="no">BulletEmitter</code>:</p>
+<pre class="qml" translate="no"><span class="type">Player</span> {
+        <span class="comment">// ...</span>
+
+        <span class="name">Component</span>.onCompleted: {
+                <span class="name">damagable</span>.<span class="name">team</span> <span class="operator">=</span> <span class="name">team</span>
+
+                <span class="comment">// The `Bullet`s require a `Team` instance. `BulletEmitter` passes one to every created</span>
+                <span class="comment">// bullet.</span>
+                <span class="name">bulletEmitter</span>.<span class="name">team</span> <span class="operator">=</span> <span class="name">team</span>
+                <span class="comment">// Set the center of the player as the bullet emission origin.</span>
+                <span class="name">bulletEmitter</span>.<span class="name">emissionOrigin</span> <span class="operator">=</span> <span class="name">player</span>
+                <span class="name">bulletEmitter</span>.<span class="name">emissionOriginOffset</span> <span class="operator">=</span> <span class="name">Qt</span>.<span class="name">point</span>(<span class="name">sprite</span>.<span class="name">width</span> <span class="operator">*</span> <span class="number">0.5</span>, <span class="name">sprite</span>.<span class="name">height</span> <span class="operator">*</span> <span class="number">0.5</span>)
+        }
+
+        <span class="comment">// ...</span>
+
+        <span class="type">TwoAxisController</span> {
+                <span class="comment">// ...</span>
+        }
+
+        <span class="type">BulletEmitter</span> {
+                <span class="name">id</span>: <span class="name">bulletEmitter</span>
+                <span class="name">bulletPrefab</span>: <span class="name">Qt</span>.<span class="name">resolvedUrl</span>(<span class="string">&quot;Bullet.qml&quot;</span>)
+        }
+
+        <span class="comment">// ...</span>
+}</pre>
+<p>And in the <code translate="no">shoot</code> function of the <code translate="no">Player</code> we replace <code translate="no">entityManager.createEntityFromUrlWithProperties</code> with <code translate="no">bulletEmitter.emit</code>:</p>
+<pre class="qml" translate="no"><span class="type">Player</span> {
+        <span class="comment">// ...</span>
+        <span class="keyword">function</span> <span class="name">shoot</span>() {
+                <span class="comment">// ...</span>
+
+                let impulse = <span class="number">150</span>;
+
+                <span class="comment">// Since the origin entity and the offset in `BulletEmitter` are set to the center of</span>
+                <span class="comment">// the player, the initial position of the bullet is (0, 0).</span>
+                <span class="name">bulletEmitter</span>.<span class="name">emit</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="name">directionX</span>, <span class="name">directionY</span>, <span class="name">impulse</span>);
+        }
+}</pre>
+<h2 id="enemies">Enemies</h2>
+<h4 id="enemy-entity">Enemy Entity</h4>
+<h4 id="making-enemies-shoot">Making Enemies shoot</h4>
+<h4 id="enemy-state-machine">Enemy State Machine</h4>
+</div>
 <!-- @@@tutorial.html -->
 </body>
 </html>

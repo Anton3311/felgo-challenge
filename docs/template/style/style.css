@@ -15,7 +15,7 @@ pre {
 
 pre, code {
 	font-family: "JetBrains Mono", monospace;
-	font-optical-sizing: auto;
+	font-size: 0.9em;
 	font-style: normal;
 }
 

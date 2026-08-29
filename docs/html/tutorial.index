@@ -12,6 +12,11 @@
             <contents name="team-component" title="Team Component" level="3"/>
             <contents name="shooting-bullets" title="Shooting Bullets" level="3"/>
             <contents name="damagable-component" title="Damagable Component" level="1"/>
+            <contents name="bulletemitter-component" title="BulletEmitter Component" level="1"/>
+            <contents name="enemies" title="Enemies" level="1"/>
+            <contents name="enemy-entity" title="Enemy Entity" level="3"/>
+            <contents name="making-enemies-shoot" title="Making Enemies shoot" level="3"/>
+            <contents name="enemy-state-machine" title="Enemy State Machine" level="3"/>
         </page>
     </namespace>
 </INDEX>
