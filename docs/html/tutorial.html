@@ -905,8 +905,9 @@ import &quot;../components&quot;
 <p>Now we can launch the game and verify that the enemy is indeed no longer immortal.</p>
 <h4 id="making-enemies-shoot">Making Enemies shoot</h4>
 <p>After creating a base for our enemy, we can start implement its attacks. For now we will keep it simple, and make it periodically shoot bullets. This is where we will need the <code translate="no">BulletEmitter</code>.</p>
-<p>This doesn't require much. We just need a single timer, that will periodically fire (every 1.2 seconds) and trigger the attack pattern.</p>
+<p>This doesn't require much. We just need a single timer, that will periodically fire (for example, every 1.2 seconds) and trigger the attack pattern.</p>
 <p>There is also one problem we quickly need to take care of. We don't know where the player is the world. To be able to shoot bullets in the direction of the player, we need to know the exact position.</p>
+<p><b>Although we don't necessarily need the reference to the <code translate="no">target</code> right now for this attack pattern, we, however, will need it a bit later. So we are better off adding it right now, to not forget.</b></p>
 <p>At this point, there are many options to handle this. For example, we could use colliders to check whenever a potential target is in range. However, we will go with a way simpler solution. In our case the only entity on the player's team is the player, there are no other players. That means, all the possible options for which entity could be a target, boil down to just the player. That said, we can simply pass the player instance from scene down to each enemy.</p>
 <p>That is what the <code translate="no">target</code> property in the <code translate="no">Ghost.qml</code> for.</p>
 <pre class="qml" translate="no"><span class="type">EntityBase</span> {

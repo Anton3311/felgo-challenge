@@ -1191,12 +1191,16 @@
 	simple, and make it periodically shoot bullets. This is where we will need the
 	\c{BulletEmitter}. 
 
-	This doesn't require much. We just need a single timer, that will periodically fire (every 1.2
-	seconds) and trigger the attack pattern.
+	This doesn't require much. We just need a single timer, that will periodically fire (for example,
+	every 1.2 seconds) and trigger the attack pattern.
 
 	There is also one problem we quickly need to take care of. We don't know where the player is the
 	world. To be able to shoot bullets in the direction of the player, we need to know the exact
 	position.
+
+	\b{Although we don't necessarily need the reference to the \c{target} right now for this attack
+	pattern, we, however, will need it a bit later. So we are better off adding it right now, to not
+	forget.}
 
 	At this point, there are many options to handle this. For example, we could use colliders to
 	check whenever a potential target is in range. However, we will go with a way simpler solution.
