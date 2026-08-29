@@ -950,10 +950,10 @@ import &quot;../components&quot;
                 }
         }
 }</pre>
-<p>The final result looks like this (note, that on this screenshot, some of the bullets have hit the walls and disappeared):</p>
+<p>The final result looks like this (note, that on this screenshot, some of the bullets have hit the walls and got destroyed):</p>
 <p class="centerAlign"><img src="images/ghostAttack1.png" alt="{Ghost Attack}" /></p><p>This was pretty neat, however I want give an example of a more sofisticated attack pattern. This attack pattern involves shooting bullets directly towards the player, while applying some variation in direction and creating bullets one by one with some time in between.</p>
 <p>This pattern is already at the limits of what the current <code translate="no">BulletEmitter</code> allows. It allows us to immediately create bullets. However, we want quite the opposite. We could add another timer to the <code translate="no">Ghost</code> enemy, that delays the creation of bullets, but it would complicate things. Furthermore we want to keep it reusable so that other pattern implementation could benefit from it.</p>
-<p>The idea here is to introduce a queue and a <code translate="no">Timer</code> to the <code translate="no">BulletEmitter</code>. The timer will fire periodically and pop an entry from the front of the queue and spawn a bullet. And in the enemy attack implementation we will simply push bullet entries to the end of the queue.</p>
+<p>The idea here is to introduce a queue and a <code translate="no">Timer</code> in the <code translate="no">BulletEmitter</code>. The timer will fire periodically and pop an entry from the front of the queue and spawn a bullet. And in the enemy attack implementation we will simply push bullet entries to the end of the queue.</p>
 <p>The modifications to the <code translate="no">BulletEmitter</code> look like this:</p>
 <pre class="qml" translate="no"><span class="type">Item</span> {
         <span class="comment">// ...</span>

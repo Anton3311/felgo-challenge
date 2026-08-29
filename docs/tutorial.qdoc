@@ -1265,7 +1265,7 @@
 	\endqml
 
 	The final result looks like this (note, that on this screenshot, some of the bullets have hit
-	the walls and disappeared):
+	the walls and got destroyed):
 
 	\image {ghostAttack1.png} {Ghost Attack}
 
@@ -1279,7 +1279,7 @@
 	Furthermore we want to keep it reusable so that other pattern implementation could benefit from
 	it.
 
-	The idea here is to introduce a queue and a \c{Timer} to the \c{BulletEmitter}. The timer will
+	The idea here is to introduce a queue and a \c{Timer} in the \c{BulletEmitter}. The timer will
 	fire periodically and pop an entry from the front of the queue and spawn a bullet. And in the 
 	enemy attack implementation we will simply push bullet entries to the end of the queue.
 
