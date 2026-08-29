@@ -964,14 +964,14 @@
 
 	One last thing we have to tackle here, is extracting creation of bullets into its own component.
 
-	This component will be called a \c{BulletEmitter} and will provide some common logic and will
-	make it easier for us to implement different attack patterns.
+	This component will be called a \c{BulletEmitter} and will provide some common logic and make it
+	easier for us to implement different attack patterns.
 
 	The process for adding a new component is already well-known. Here we pretty much want to
 	extract the code we already have in the player entity, into a new place, with some minor
 	adjustments: the bullets will be emitted relative to some "origin" entity. The users of this
-	component will need to provide the initial position of the bullet relative to that origin. In
-	usual cases the origin entity will be the plyaer itself or the enemy.
+	component will need to provide the initial position of the bullet relative to that origin. Most
+	likely the origin will be the player or the enemy itself.
 
 	Here we have a code snippet extracted from the \c{Player.qml}:
 
