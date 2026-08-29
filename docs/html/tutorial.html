@@ -608,7 +608,7 @@ import &quot;../components&quot;
 }</pre>
 <p>And that is pretty much it, for this mechanic.</p>
 <h2 id="damagable-component">Damagable Component</h2>
-<p>Before we dive into implementing enemies we need to preapre some more common building blocks. Besides the <code translate="no">Team</code> being common between both the player and the enemies, one more thing they share is health. So here we will add exactly that. Health in our game will be reperesanted/handled by the <code translate="no">Damagable</code> component.</p>
+<p>Before we dive into implementing enemies we need to prepare some more common building blocks. Besides the <code translate="no">Team</code> being common between both the player and the enemies, one more thing they share is health. So here we will add exactly that. Health in our game will be reperesanted/handled by the <code translate="no">Damagable</code> component.</p>
 <p>This a rather simple component and doesn't require much code. It will have a single function for appling damage, and a couple of signals to notify the outside world:</p>
 <pre class="qml" translate="no">import QtQuick
 import Felgo
@@ -670,7 +670,7 @@ import Felgo
 
         <span class="comment">// ...</span>
 }</pre>
-<p>Now the player has health, however we can't see how much of it is currently left, so we will add a little UI for that. The use will be rather simple and just be a row of either full or empty hearts. Two <code translate="no">Repeater</code>s will be more than enough.</p>
+<p>Now the player has health, however we can't see how much of it is currently left, so we will add a little UI for that. The UI will be rather simple and just be a row of either full or empty hearts. Two <code translate="no">Repeater</code>s will do the trick.</p>
 <p>The first repeater will place <code translate="no">damagable.health</code> number of full hearts and the other one will place <code translate="no">damagable.maxHealth - damagable.health</code> number of empty hearts.</p>
 <p>We start by creating a new file under <code translate="no">qml/ui</code></p>
 <pre class="qml" translate="no">import QtQuick

@@ -805,7 +805,7 @@
 
 	\section1 Damagable Component
 
-	Before we dive into implementing enemies we need to preapre some more common building blocks.
+	Before we dive into implementing enemies we need to prepare some more common building blocks.
 	Besides the \c{Team} being common between both the player and the enemies, one more thing they 
 	share is health. So here we will add exactly that. Health in our game will be
 	reperesanted/handled by the \c{Damagable} component.
@@ -882,8 +882,8 @@
 	\endqml
 
 	Now the player has health, however we can't see how much of it is currently left, so we will add
-	a little UI for that. The use will be rather simple and just be a row of either full or empty
-	hearts. Two \c{Repeater}s will be more than enough.
+	a little UI for that. The UI will be rather simple and just be a row of either full or empty
+	hearts. Two \c{Repeater}s will do the trick.
 
 	The first repeater will place \c{damagable.health} number of full hearts and the other one will
 	place \c{damagable.maxHealth - damagable.health} number of empty hearts.
