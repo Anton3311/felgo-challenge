@@ -959,7 +959,103 @@ import &quot;../components&quot;
         }
 }</pre>
 <p>The final result looks like this (note, that on this screenshot, some of the bullets have hit the walls and disappeared):</p>
-<p class="centerAlign"><img src="images/ghostAttack1.png" alt="{Ghost Attack}" /></p><h4 id="enemy-state-machine">Enemy State Machine</h4>
+<p class="centerAlign"><img src="images/ghostAttack1.png" alt="{Ghost Attack}" /></p><p>This was pretty neat, however I want give an example of a more sofisticated attack pattern. This attack pattern involves shooting bullets directly towards the player, while applying some variation in direction and creating bullets one by one with some time in between.</p>
+<p>This pattern is already at the limits of what the current <code translate="no">BulletEmitter</code> allows. It allows us to immediately create bullets. However, we want quite the opposite. We could add another timer to the <code translate="no">Ghost</code> enemy, that delays the creation of bullets, but it would complicate things. Furthermore we want to keep it reusable so that other pattern implementation could benefit from it.</p>
+<p>The idea here is to introduce a queue and a <code translate="no">Timer</code> to the <code translate="no">BulletEmitter</code>. The timer will fire periodically and pop an entry from the front of the queue and spawn a bullet. And in the enemy attack implementation we will simply push bullet entries to the end of the queue.</p>
+<p>The modifications to the <code translate="no">BulletEmitter</code> look like this:</p>
+<pre class="qml" translate="no"><span class="type">Item</span> {
+        <span class="comment">// ...</span>
+        property <span class="type">point</span> <span class="name">emissionOriginOffset</span>: <span class="name">Qt</span>.<span class="name">point</span>(<span class="number">0</span>, <span class="number">0</span>)
+
+        property <span class="type">var</span> <span class="name">queue</span>: []
+
+        <span class="type">Timer</span> {
+                <span class="name">running</span>: <span class="number">true</span>
+                <span class="name">interval</span>: <span class="number">100</span>
+                <span class="name">repeat</span>: <span class="number">true</span>
+                <span class="name">onTriggered</span>: {
+                        <span class="keyword">if</span> (<span class="name">queue</span>.<span class="name">length</span> <span class="operator">===</span> <span class="number">0</span>) {
+                                <span class="keyword">return</span>;
+                        }
+
+                        let first = <span class="name">self</span>.<span class="name">queue</span>.<span class="name">shift</span>();
+                        <span class="name">emit</span>(<span class="name">first</span>.<span class="name">x</span>,
+                                <span class="name">first</span>.<span class="name">y</span>,
+                                <span class="name">first</span>.<span class="name">directionX</span>,
+                                <span class="name">first</span>.<span class="name">directionY</span>,
+                                <span class="name">first</span>.<span class="name">impulse</span>);
+                }
+        }
+
+        <span class="keyword">function</span> <span class="name">enqueueForEmission</span>(positionX, positionY, directionX, directionY, impulse) {
+                <span class="name">self</span>.<span class="name">queue</span>.<span class="name">push</span>({
+                        &quot;x&quot;: <span class="name">positionX</span>,
+                        &quot;y&quot;: <span class="name">positionY</span>,
+                        &quot;directionX&quot;: <span class="name">directionX</span>,
+                        &quot;directionY&quot;: <span class="name">directionY</span>,
+                        &quot;impulse&quot;: <span class="name">impulse</span>
+                })
+        }
+
+        <span class="comment">// Here `positionX` and `positionY` are local to the `emissionOrigin` entity</span>
+        <span class="keyword">function</span> <span class="name">emit</span>(positionX, positionY, directionX, directionY, impulse) {
+                <span class="comment">// ...</span>
+        }
+}</pre>
+<p>And now we are ready to implement our new sofisticated attack pattern. The code for this pattern is actually quite similar to the first one we had. What changed is how we compute the angle. Before we just used to evenly space things out across the circumference. However, right now we use <code translate="no">atan2</code> to compute the angle between the X axis and the direction towards the player. Then, when spawning bullets, we apply a random jitter to that angle, and use our newly created <code translate="no">enqueueForEmission</code>.</p>
+<pre class="qml" translate="no"><span class="type">EnemyBase</span> {
+        <span class="comment">// ...</span>
+
+        <span class="keyword">function</span> <span class="name">randomInRange</span>(min, max) {
+                let value = <span class="name">Math</span>.<span class="name">random</span>();
+                <span class="keyword">return</span> <span class="name">min</span> <span class="operator">+</span> <span class="name">value</span> <span class="operator">*</span> (<span class="name">max</span> <span class="operator">-</span> <span class="name">min</span>)
+        }
+
+        <span class="type">Timer</span> {
+                <span class="comment">// ...</span>
+                <span class="name">onTriggered</span>: {
+                        <span class="keyword">if</span> (<span class="name">target</span> <span class="operator">===</span> <span class="number">null</span>) {
+                                <span class="keyword">return</span>;
+                        }
+
+                        let dx = <span class="name">target</span>.<span class="name">x</span> <span class="operator">-</span> <span class="name">self</span>.<span class="name">x</span>
+                        let dy = <span class="name">target</span>.<span class="name">y</span> <span class="operator">-</span> <span class="name">self</span>.<span class="name">y</span>
+                        let angleTowardsTarget = <span class="name">Math</span>.<span class="name">atan2</span>(<span class="name">dy</span>, <span class="name">dx</span>)
+
+                        let spread = <span class="name">Math</span>.<span class="name">PI</span> <span class="operator">/</span> <span class="number">6</span>;
+                        let count = <span class="number">4</span>;
+                        <span class="keyword">for</span> (let i = 0; <span class="name">i</span> <span class="operator">&lt;</span> <span class="name">count</span>; <span class="name">i</span> <span class="operator">+=</span> <span class="number">1</span>) {
+                                let spreadAngle = <span class="name">randomInRange</span>(-<span class="name">spread</span> <span class="operator">/</span> <span class="number">2</span>, <span class="name">spread</span> <span class="operator">/</span> <span class="number">2</span>)
+                                let angle = <span class="name">angleTowardsTarget</span> <span class="operator">+</span> <span class="name">spreadAngle</span>
+
+                                let x = <span class="name">Math</span>.<span class="name">cos</span>(<span class="name">angle</span>);
+                                let y = <span class="name">Math</span>.<span class="name">sin</span>(<span class="name">angle</span>);
+                                <span class="name">bulletEmitter</span>.<span class="name">enqueueForEmission</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="name">x</span>, <span class="name">y</span>, <span class="number">150</span>);
+                        }
+                }
+        }
+}</pre>
+<p>Our new attack pattern is done. Although, we had to get rid of the first one, we can still use in a different place. For example, whenever the enemy dies. This shouldn't be that difficult to implement. We only have to move the pattern code to the <code translate="no">death</code> signal handler, where we already have <code translate="no">self.destroy()</code>.</p>
+<pre class="qml" translate="no"><span class="type">Damagable</span> {
+        <span class="name">id</span>: <span class="name">myDamagable</span>
+        <span class="name">maxHealth</span>: <span class="number">4</span>
+        <span class="name">onDeath</span>: {
+                let count = <span class="number">12</span>;
+                let angleStep = <span class="number">2</span> <span class="operator">*</span> <span class="name">Math</span>.<span class="name">PI</span> <span class="operator">/</span> <span class="name">count</span>
+                        <span class="keyword">for</span> (let i = 0; <span class="name">i</span> <span class="operator">&lt;</span> <span class="name">count</span>; <span class="name">i</span> <span class="operator">+=</span> <span class="number">1</span>) {
+                                let angle = <span class="name">angleStep</span> <span class="operator">*</span> <span class="name">i</span>;
+
+                                let x = <span class="name">Math</span>.<span class="name">cos</span>(<span class="name">angle</span>);
+                                let y = <span class="name">Math</span>.<span class="name">sin</span>(<span class="name">angle</span>);
+
+                                <span class="name">bulletEmitter</span>.<span class="name">emit</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="name">x</span>, <span class="name">y</span>, <span class="number">150</span>);
+                        }
+
+                <span class="name">self</span>.<span class="name">destroy</span>();
+        }
+}</pre>
+<p>That is pretty much it. We can now test our enemy.</p>
+<p class="centerAlign"><img src="images/ghostAttack2.png" alt="{Ghost Attack 2}" /></p><h4 id="enemy-state-machine">Enemy State Machine</h4>
 </div>
 <!-- @@@tutorial.html -->
 </body>

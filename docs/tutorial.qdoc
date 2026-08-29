@@ -1275,5 +1275,135 @@
 
 	\image {ghostAttack1.png} {Ghost Attack}
 
+	This was pretty neat, however I want give an example of a more sofisticated attack pattern. This
+	attack pattern involves shooting bullets directly towards the player, while applying some
+	variation in direction and creating bullets one by one with some time in between.
+
+	This pattern is already at the limits of what the current \c{BulletEmitter} allows. It allows us
+	to immediately create bullets. However, we want quite the opposite. We could add another timer
+	to the \c{Ghost} enemy, that delays the creation of bullets, but it would complicate things.
+	Furthermore we want to keep it reusable so that other pattern implementation could benefit from
+	it.
+
+	The idea here is to introduce a queue and a \c{Timer} to the \c{BulletEmitter}. The timer will
+	fire periodically and pop an entry from the front of the queue and spawn a bullet. And in the 
+	enemy attack implementation we will simply push bullet entries to the end of the queue.
+
+	The modifications to the \c{BulletEmitter} look like this:
+
+	\qml
+	Item {
+		// ...
+		property point emissionOriginOffset: Qt.point(0, 0)
+
+		property var queue: []
+
+		Timer {
+			running: true
+			interval: 100
+			repeat: true
+			onTriggered: {
+				if (queue.length === 0) {
+					return;	
+				}
+
+				let first = self.queue.shift();
+				emit(first.x,
+					first.y,
+					first.directionX,
+					first.directionY,
+					first.impulse);
+			}
+		}
+
+		function enqueueForEmission(positionX, positionY, directionX, directionY, impulse) {
+			self.queue.push({
+				"x": positionX,
+				"y": positionY,
+				"directionX": directionX,
+				"directionY": directionY,
+				"impulse": impulse
+			})
+		}
+
+		// Here `positionX` and `positionY` are local to the `emissionOrigin` entity
+		function emit(positionX, positionY, directionX, directionY, impulse) {
+			// ...
+		}
+	}
+	\endqml
+
+	And now we are ready to implement our new sofisticated attack pattern. The code for this pattern
+	is actually quite similar to the first one we had. What changed is how we compute the angle. 
+	Before we just used to evenly space things out across the circumference. However, right now we
+	use \c{atan2} to compute the angle between the X axis and the direction towards the player. Then,
+	when spawning bullets, we apply a random jitter to that angle, and use our newly created
+	\c{enqueueForEmission}.
+
+	\qml
+	EnemyBase {
+		// ...
+
+		function randomInRange(min, max) {
+			let value = Math.random();
+			return min + value * (max - min)
+		}
+
+		Timer {
+			// ...
+			onTriggered: {
+				if (target === null) {
+					return;
+				}
+
+				let dx = target.x - self.x
+				let dy = target.y - self.y
+				let angleTowardsTarget = Math.atan2(dy, dx)
+
+				let spread = Math.PI / 6;
+				let count = 4;
+				for (let i = 0; i < count; i += 1) {
+					let spreadAngle = randomInRange(-spread / 2, spread / 2)
+					let angle = angleTowardsTarget + spreadAngle
+
+					let x = Math.cos(angle);
+					let y = Math.sin(angle);
+					bulletEmitter.enqueueForEmission(0, 0, x, y, 150);
+				}
+			}
+		}
+	}
+	\endqml
+
+	Our new attack pattern is done. Although, we had to get rid of the first one, we can still use
+	in a different place. For example, whenever the enemy dies. This shouldn't be that difficult to
+	implement. We only have to move the pattern code to the \c{death} signal handler, where we
+	already have \c{self.destroy()}.
+
+	\qml
+	Damagable {
+		id: myDamagable
+		maxHealth: 4
+		onDeath: {
+			let count = 12;
+			let angleStep = 2 * Math.PI / count
+				for (let i = 0; i < count; i += 1) {
+					let angle = angleStep * i;
+
+					let x = Math.cos(angle);
+					let y = Math.sin(angle);
+
+					bulletEmitter.emit(0, 0, x, y, 150);
+				}
+
+			self.destroy();
+		}
+	}
+	\endqml
+
+	That is pretty much it. We can now test our enemy.
+
+	\image {ghostAttack2.png} {Ghost Attack 2}
+
 	\section3 Enemy State Machine
 */
