@@ -1222,10 +1222,6 @@
 			repeat: true
 			running: true
 			onTriggered: {
-				if (target === null) {
-					return;
-				}
-
 				// attack pattern goes here
 			}
 		}
@@ -1252,10 +1248,6 @@
 		id: attackTimer
 		// ...
 		onTriggered: {
-			if (target === null) {
-				return;
-			}
-
 			let count = 12;
 			let angleStep = 2 * Math.PI / count
 			for (let i = 0; i < count; i += 1) {
@@ -1352,10 +1344,6 @@
 		Timer {
 			// ...
 			onTriggered: {
-				if (target === null) {
-					return;
-				}
-
 				let dx = target.x - self.x
 				let dy = target.y - self.y
 				let angleTowardsTarget = Math.atan2(dy, dx)
@@ -1406,4 +1394,107 @@
 	\image {ghostAttack2.png} {Ghost Attack 2}
 
 	\section3 Enemy State Machine
+
+	And finally, the last thing we will tackle in this tutorial is a simple enemy AI, since right
+	now the enemy, besides the attacks, doesn't do much. The AI will be a state machine with only 2
+	states: attacking and following. In terms of the attack state, there isn't much, we've already
+	implemented and will only need to port it to work with the state machine. That means, we are
+	left with implementing the state mchine and the \c{following} state.
+
+	The \c{following} state isn't complicated either, it simply involves moving the enemy towards 
+	the player, until it is in range. When in range we switch the enemy into the \c{attacking}
+	state.
+
+	To implement our state machine, we will start with the next modifications to our enemy code:
+
+	\qml
+	EntityBase {
+		// ...
+		state: "follow"
+		states: [
+			State {
+				name: "follow"
+				PropertyChanges { target: attackTimer; running: false }
+			},
+			State {
+				name: "attack"
+				PropertyChanges { target: attackTimer; running: true }
+			}
+		]
+	}
+	\endqml
+
+	We will also need to run some code everyframe. For example, every frame we will check whether
+	the player is still in range and also try to move the enemy towards the player.
+
+	That will be taken care of by a \c{Timer} that runs every \c{16ms} (assuming we are running at
+	60 frames per second).
+
+	\qml
+	Timer {
+		id: updateTimer 
+		interval: 16
+		running: true
+		repeat: true
+		onTriggered: {
+			// Here we update the whole state machine of this enemy
+
+			switch (state) {
+			case "attack":
+				// Actual bullet emission is ran on its own timer
+				//
+				// So here we only have to check, whether the target is still in range
+				if (!isTargetWithinRange()) {
+					// No target in range, go back to following
+					state = "follow"
+				}
+
+				break;
+			case "follow":
+				if (isTargetWithinRange()) {
+					// The target is in range, the enemy can start attacking.
+					state = "attack";
+				} else {
+					// The target is not in range.
+					//
+					// Move towards it.
+					let dx = target.x - self.x
+					let dy = target.y - self.y
+					let distanceToTarget = Math.sqrt(dx * dx + dy * dy)
+
+					// Normalize the direction
+					dx /= distanceToTarget;
+					dy /= distanceToTarget;
+
+					let speed = 80
+					collider.linearVelocity = Qt.point(dx * speed, dy * speed);
+				}
+
+				break;
+			}
+		}
+	}
+	\endqml
+
+	And also add the helper function \c{isTargetWithinRange}:
+
+	\qml
+	EntityBase {
+		// ...
+		property int attackRange: 220
+
+		// ...
+
+		// This is this a simple distance check.
+		function isTargetWithinRange() {
+			let dx = target.x - self.x
+			let dy = target.y - self.y
+			let distanceToTarget = Math.sqrt(dx * dx + dy * dy)
+			return distanceToTarget <= attackRange;
+		}
+	}
+	\endqml
+
+	And these were the final changes, we need to make to get the state machine working. Now we have 
+	a fully working enemy with two state and two distinct attack patterns.
 */

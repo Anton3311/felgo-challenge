@@ -923,10 +923,6 @@ import &quot;../components&quot;
                 <span class="name">repeat</span>: <span class="number">true</span>
                 <span class="name">running</span>: <span class="number">true</span>
                 <span class="name">onTriggered</span>: {
-                        <span class="keyword">if</span> (<span class="name">target</span> <span class="operator">===</span> <span class="number">null</span>) {
-                                <span class="keyword">return</span>;
-                        }
-
                         <span class="comment">// attack pattern goes here</span>
                 }
         }
@@ -942,10 +938,6 @@ import &quot;../components&quot;
         <span class="name">id</span>: <span class="name">attackTimer</span>
         <span class="comment">// ...</span>
         <span class="name">onTriggered</span>: {
-                <span class="keyword">if</span> (<span class="name">target</span> <span class="operator">===</span> <span class="number">null</span>) {
-                        <span class="keyword">return</span>;
-                }
-
                 let count = <span class="number">12</span>;
                 let angleStep = <span class="number">2</span> <span class="operator">*</span> <span class="name">Math</span>.<span class="name">PI</span> <span class="operator">/</span> <span class="name">count</span>
                 <span class="keyword">for</span> (let i = 0; <span class="name">i</span> <span class="operator">&lt;</span> <span class="name">count</span>; <span class="name">i</span> <span class="operator">+=</span> <span class="number">1</span>) {
@@ -1014,10 +1006,6 @@ import &quot;../components&quot;
         <span class="type">Timer</span> {
                 <span class="comment">// ...</span>
                 <span class="name">onTriggered</span>: {
-                        <span class="keyword">if</span> (<span class="name">target</span> <span class="operator">===</span> <span class="number">null</span>) {
-                                <span class="keyword">return</span>;
-                        }
-
                         let dx = <span class="name">target</span>.<span class="name">x</span> <span class="operator">-</span> <span class="name">self</span>.<span class="name">x</span>
                         let dy = <span class="name">target</span>.<span class="name">y</span> <span class="operator">-</span> <span class="name">self</span>.<span class="name">y</span>
                         let angleTowardsTarget = <span class="name">Math</span>.<span class="name">atan2</span>(<span class="name">dy</span>, <span class="name">dx</span>)
@@ -1056,6 +1044,84 @@ import &quot;../components&quot;
 }</pre>
 <p>That is pretty much it. We can now test our enemy.</p>
 <p class="centerAlign"><img src="images/ghostAttack2.png" alt="{Ghost Attack 2}" /></p><h4 id="enemy-state-machine">Enemy State Machine</h4>
+<p>And finally, the last thing we will tackle in this tutorial is a simple enemy AI, since right now the enemy, besides the attacks, doesn't do much. The AI will be a state machine with only 2 states: attacking and following. In terms of the attack state, there isn't much, we've already implemented and will only need to port it to work with the state machine. That means, we are left with implementing the state mchine and the <code translate="no">following</code> state.</p>
+<p>The <code translate="no">following</code> state isn't complicated either, it simply involves moving the enemy towards the player, until it is in range. When in range we switch the enemy into the <code translate="no">attacking</code> state.</p>
+<p>To implement our state machine, we will start with the next modifications to our enemy code:</p>
+<pre class="qml" translate="no"><span class="type">EntityBase</span> {
+        <span class="comment">// ...</span>
+        <span class="name">state</span>: <span class="string">&quot;follow&quot;</span>
+        <span class="name">states</span>: [
+                <span class="type">State</span> {
+                        <span class="name">name</span>: <span class="string">&quot;follow&quot;</span>
+                        <span class="type">PropertyChanges</span> { <span class="name">target</span>: <span class="name">attackTimer</span>; <span class="name">running</span>: <span class="number">false</span> }
+                },
+                <span class="type">State</span> {
+                        <span class="name">name</span>: <span class="string">&quot;attack&quot;</span>
+                        <span class="type">PropertyChanges</span> { <span class="name">target</span>: <span class="name">attackTimer</span>; <span class="name">running</span>: <span class="number">true</span> }
+                }
+        ]
+}</pre>
+<p>We will also need to run some code everyframe. For example, every frame we will check whether the player is still in range and also try to move the enemy towards the player.</p>
+<p>That will be taken care of by a <code translate="no">Timer</code> that runs every <code translate="no">16ms</code> (assuming we are running at 60 frames per second).</p>
+<pre class="qml" translate="no"><span class="type">Timer</span> {
+        <span class="name">id</span>: <span class="name">updateTimer</span>
+        <span class="name">interval</span>: <span class="number">16</span>
+        <span class="name">running</span>: <span class="number">true</span>
+        <span class="name">repeat</span>: <span class="number">true</span>
+        <span class="name">onTriggered</span>: {
+                <span class="comment">// Here we update the whole state machine of this enemy</span>
+
+                <span class="keyword">switch</span> (<span class="name">state</span>) {
+                <span class="keyword">case</span> <span class="string">&quot;attack&quot;</span>:
+                        <span class="comment">// Actual bullet emission is ran on its own timer</span>
+                        <span class="comment">//</span>
+                        <span class="comment">// So here we only have to check, whether the target is still in range</span>
+                        <span class="keyword">if</span> (!<span class="name">isTargetWithinRange</span>()) {
+                                <span class="comment">// No target in range, go back to following</span>
+                                <span class="name">state</span> <span class="operator">=</span> <span class="string">&quot;follow&quot;</span>
+                        }
+
+                        <span class="keyword">break</span>;
+                <span class="keyword">case</span> <span class="string">&quot;follow&quot;</span>:
+                        <span class="keyword">if</span> (<span class="name">isTargetWithinRange</span>()) {
+                                <span class="comment">// The target is in range, the enemy can start attacking.</span>
+                                <span class="name">state</span> <span class="operator">=</span> <span class="string">&quot;attack&quot;</span>;
+                        } <span class="keyword">else</span> {
+                                <span class="comment">// The target is not in range.</span>
+                                <span class="comment">//</span>
+                                <span class="comment">// Move towards it.</span>
+                                let dx = <span class="name">target</span>.<span class="name">x</span> <span class="operator">-</span> <span class="name">self</span>.<span class="name">x</span>
+                                let dy = <span class="name">target</span>.<span class="name">y</span> <span class="operator">-</span> <span class="name">self</span>.<span class="name">y</span>
+                                let distanceToTarget = <span class="name">Math</span>.<span class="name">sqrt</span>(<span class="name">dx</span> <span class="operator">*</span> <span class="name">dx</span> <span class="operator">+</span> <span class="name">dy</span> <span class="operator">*</span> <span class="name">dy</span>)
+
+                                <span class="comment">// Normalize the direction</span>
+                                <span class="name">dx</span> <span class="operator">/=</span> <span class="name">distanceToTarget</span>;
+                                <span class="name">dy</span> <span class="operator">/=</span> <span class="name">distanceToTarget</span>;
+
+                                let speed = <span class="number">80</span>
+                                <span class="name">collider</span>.<span class="name">linearVelocity</span> <span class="operator">=</span> <span class="name">Qt</span>.<span class="name">point</span>(<span class="name">dx</span> <span class="operator">*</span> <span class="name">speed</span>, <span class="name">dy</span> <span class="operator">*</span> <span class="name">speed</span>);
+                        }
+
+                        <span class="keyword">break</span>;
+                }
+        }
+}</pre>
+<p>And also add the helper function <code translate="no">isTargetWithinRange</code>:</p>
+<pre class="qml" translate="no"><span class="type">EntityBase</span> {
+        <span class="comment">// ...</span>
+        property <span class="type">int</span> <span class="name">attackRange</span>: <span class="number">220</span>
+
+        <span class="comment">// ...</span>
+
+        <span class="comment">// This is this a simple distance check.</span>
+        <span class="keyword">function</span> <span class="name">isTargetWithinRange</span>() {
+                let dx = <span class="name">target</span>.<span class="name">x</span> <span class="operator">-</span> <span class="name">self</span>.<span class="name">x</span>
+                let dy = <span class="name">target</span>.<span class="name">y</span> <span class="operator">-</span> <span class="name">self</span>.<span class="name">y</span>
+                let distanceToTarget = <span class="name">Math</span>.<span class="name">sqrt</span>(<span class="name">dx</span> <span class="operator">*</span> <span class="name">dx</span> <span class="operator">+</span> <span class="name">dy</span> <span class="operator">*</span> <span class="name">dy</span>)
+                <span class="keyword">return</span> <span class="name">distanceToTarget</span> <span class="operator">&lt;=</span> <span class="name">attackRange</span>;
+        }
+}</pre>
+<p>And these were the final changes, we need to make to get the state machine working. Now we have a fully working enemy with two state and two distinct attack patterns.</p>
 </div>
 <!-- @@@tutorial.html -->
 </body>
