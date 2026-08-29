@@ -1072,8 +1072,8 @@
 	come in handy later).
 
 	After taking parts of the player and appling some minor modifications like changing the
-	\c{maxHealth} and the \c{sprite}, and handling \c{death} signal of the \c{Damagable}, we get
-	something like this:
+	\c{maxHealth} and the \c{sprite}, and handling \c{death} signal of the \c{Damagable}, we end up
+	with something like this:
 	
 	\qml
 	import QtQuick
@@ -1140,7 +1140,7 @@
 	\endqml
 
 	Now if you were to launch the game and test the enemy, you will notice that the enemy doesn't
-	seem to recieve any damage and more over seems to be immortal. The reason for that is rather
+	seem to recieve any damage and moreover seems to be immortal. The reason for that is rather
 	simple: we forgot to implement one tiny but crucial feature of the \c{Bullet}. Right now when a
 	bullet hits an entity it doesn't apply any damage. It simply destroys itself.
 

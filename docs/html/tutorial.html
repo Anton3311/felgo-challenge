@@ -809,7 +809,7 @@ import Felgo
 <p>As a part of this tutorial we will create a single enemy, which will be a ghost.</p>
 <div class="pixel-art-tile"><p class="centerAlign"><img src="images/ghost.png" alt="{Ghost}" /></p></div><h4 id="enemy-entity">Enemy Entity</h4>
 <p>We start of as usual by creating a new entity file. The majority of it can be inherited from the <code translate="no">Player</code>, specifically: <code translate="no">Damagable</code>, <code translate="no">CircleCollider</code> and <code translate="no">BulletEmitter</code> (which will come in handy later).</p>
-<p>After taking parts of the player and appling some minor modifications like changing the <code translate="no">maxHealth</code> and the <code translate="no">sprite</code>, and handling <code translate="no">death</code> signal of the <code translate="no">Damagable</code>, we get something like this:</p>
+<p>After taking parts of the player and appling some minor modifications like changing the <code translate="no">maxHealth</code> and the <code translate="no">sprite</code>, and handling <code translate="no">death</code> signal of the <code translate="no">Damagable</code>, we end up with something like this:</p>
 <pre class="qml" translate="no">import QtQuick
 import Felgo
 import &quot;../components&quot;
@@ -867,7 +867,7 @@ import &quot;../components&quot;
         <span class="name">y</span>: <span class="name">levelBackground</span>.<span class="name">levelWalls</span>.<span class="name">y</span> <span class="operator">+</span> <span class="name">levelBackground</span>.<span class="name">levelSize</span> <span class="operator">/</span> <span class="number">4</span>
         <span class="name">team</span>: <span class="name">enemyTeam</span>
 }</pre>
-<p>Now if you were to launch the game and test the enemy, you will notice that the enemy doesn't seem to recieve any damage and more over seems to be immortal. The reason for that is rather simple: we forgot to implement one tiny but crucial feature of the <code translate="no">Bullet</code>. Right now when a bullet hits an entity it doesn't apply any damage. It simply destroys itself.</p>
+<p>Now if you were to launch the game and test the enemy, you will notice that the enemy doesn't seem to recieve any damage and moreover seems to be immortal. The reason for that is rather simple: we forgot to implement one tiny but crucial feature of the <code translate="no">Bullet</code>. Right now when a bullet hits an entity it doesn't apply any damage. It simply destroys itself.</p>
 <p>Let's fix that. The fix is pretty straightforward. The one thing we need to keep in mind, is that if the entity and the bullet are on the same <code translate="no">Team</code> we don't apply the damage.</p>
 <pre class="qml" translate="no"><span class="type">EntityBase</span> {
         <span class="name">id</span>: <span class="name">bullet</span>
