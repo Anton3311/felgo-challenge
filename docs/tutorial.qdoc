@@ -1399,15 +1399,17 @@
 
 	And finally, the last thing we will tackle in this tutorial is a simple enemy AI, since right
 	now the enemy, besides the attacks, doesn't do much. The AI will be a state machine with only 2
-	states: attacking and following. In terms of the attack state, there isn't much, we've already
-	implemented and will only need to port it to work with the state machine. That means, we are
-	left with implementing the state mchine and the \c{following} state.
+	states: attacking and following. In terms of the attack state, there isn't much, as we've
+	already implemented it and will only need to port it to work with the state machine. That means,
+	we are left with implementing the state mchine and the \c{following} state.
 
 	The \c{following} state isn't complicated either, it simply involves moving the enemy towards 
 	the player, until it is in range. When in range we switch the enemy into the \c{attacking}
 	state.
 
-	To implement our state machine, we will start with the next modifications to our enemy code:
+	To implement our state machine, we will start with the next modifications to our enemy code.
+	Here we will turn on and off the \c{attackTimer} whenever the enemy enters/leaves the
+	\c{attacking} state.
 
 	\qml
 	EntityBase {
@@ -1426,8 +1428,8 @@
 	}
 	\endqml
 
-	We will also need to run some code everyframe. For example, every frame we will check whether
-	the player is still in range and also try to move the enemy towards the player.
+	We will also need to run some code every frame. For example, every frame we will check whether
+	the target is still in range and also try to move the enemy towards the target.
 
 	That will be taken care of by a \c{Timer} that runs every \c{16ms} (assuming we are running at
 	60 frames per second).
@@ -1506,8 +1508,8 @@
 	Hell genre.
 
 	Here we went through implementing player controls, bullet mechanics and shooting, an enemy, its
-	state mchine and attack patterns. Besides that, this tutorial describes how were all the game
-	components were created in way that allows, you to assemble them without much problems to create
+	state machine and attack patterns. Besides that, this tutorial describes how all the game
+	components were created in way that allows, to assemble them without much problems to create
 	new entities, enemies and their attack patterns.
 
 	This game, however, still lacks some features, like:
@@ -1517,4 +1519,9 @@
 	\li spawning of waves
 	\li sound effects
 	\endlist
+
+	But with the current foundation it should be much easier to expand the game further. As an
+	example, use can checkout the
+	\l {https://github.com/Anton3311/felgo-challenge} {GitHub repository}.
+	It contains a more complete version of the game, then the one described in this tutorial.
 */

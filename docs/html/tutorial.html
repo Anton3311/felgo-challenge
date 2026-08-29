@@ -1044,9 +1044,9 @@ import &quot;../components&quot;
 }</pre>
 <p>That is pretty much it. We can now test our enemy.</p>
 <p class="centerAlign"><img src="images/ghostAttack2.png" alt="{Ghost Attack 2}" /></p><h4 id="enemy-state-machine">Enemy State Machine</h4>
-<p>And finally, the last thing we will tackle in this tutorial is a simple enemy AI, since right now the enemy, besides the attacks, doesn't do much. The AI will be a state machine with only 2 states: attacking and following. In terms of the attack state, there isn't much, we've already implemented and will only need to port it to work with the state machine. That means, we are left with implementing the state mchine and the <code translate="no">following</code> state.</p>
+<p>And finally, the last thing we will tackle in this tutorial is a simple enemy AI, since right now the enemy, besides the attacks, doesn't do much. The AI will be a state machine with only 2 states: attacking and following. In terms of the attack state, there isn't much, as we've already implemented it and will only need to port it to work with the state machine. That means, we are left with implementing the state mchine and the <code translate="no">following</code> state.</p>
 <p>The <code translate="no">following</code> state isn't complicated either, it simply involves moving the enemy towards the player, until it is in range. When in range we switch the enemy into the <code translate="no">attacking</code> state.</p>
-<p>To implement our state machine, we will start with the next modifications to our enemy code:</p>
+<p>To implement our state machine, we will start with the next modifications to our enemy code. Here we will turn on and off the <code translate="no">attackTimer</code> whenever the enemy enters/leaves the <code translate="no">attacking</code> state.</p>
 <pre class="qml" translate="no"><span class="type">EntityBase</span> {
         <span class="comment">// ...</span>
         <span class="name">state</span>: <span class="string">&quot;follow&quot;</span>
@@ -1061,7 +1061,7 @@ import &quot;../components&quot;
                 }
         ]
 }</pre>
-<p>We will also need to run some code everyframe. For example, every frame we will check whether the player is still in range and also try to move the enemy towards the player.</p>
+<p>We will also need to run some code every frame. For example, every frame we will check whether the target is still in range and also try to move the enemy towards the target.</p>
 <p>That will be taken care of by a <code translate="no">Timer</code> that runs every <code translate="no">16ms</code> (assuming we are running at 60 frames per second).</p>
 <pre class="qml" translate="no"><span class="type">Timer</span> {
         <span class="name">id</span>: <span class="name">updateTimer</span>
@@ -1124,7 +1124,7 @@ import &quot;../components&quot;
 <p>And these were the final changes, we need to make to get the state machine working. Now we have a fully working enemy with two state and two distinct attack patterns.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>After following this tutorial you will end up with a pretty solid base for a game in a Bullet Hell genre.</p>
-<p>Here we went through implementing player controls, bullet mechanics and shooting, an enemy, its state mchine and attack patterns. Besides that, this tutorial describes how were all the game components were created in way that allows, you to assemble them without much problems to create new entities, enemies and their attack patterns.</p>
+<p>Here we went through implementing player controls, bullet mechanics and shooting, an enemy, its state machine and attack patterns. Besides that, this tutorial describes how all the game components were created in way that allows, to assemble them without much problems to create new entities, enemies and their attack patterns.</p>
 <p>This game, however, still lacks some features, like:</p>
 <ul>
 <li>a main menu</li>
@@ -1132,6 +1132,7 @@ import &quot;../components&quot;
 <li>spawning of waves</li>
 <li>sound effects</li>
 </ul>
+<p>But with the current foundation it should be much easier to expand the game further. As an example, use can checkout the <a href="https://github.com/Anton3311/felgo-challenge">GitHub repository</a>. It contains a more complete version of the game, then the one described in this tutorial.</p>
 </div>
 <!-- @@@tutorial.html -->
 </body>
