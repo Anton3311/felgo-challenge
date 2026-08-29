@@ -21,9 +21,6 @@
 	All of the used art assets are available in GitHub Repository under
 	\l {https://github.com/Anton3311/felgo-challenge/tree/main/assets/entities} {assets/entities}
 
-	The pixel font used in the game is available on
-	\l {https://fonts.google.com/specimen/Jersey+10?query=Jersey+10&preview.script=Latn} {Google Fonts}
-
 	\section1 Project Setup
 
 	Start by creating a new \b{Felgo Games} project in Qt Creator. Sepcifically we will need
@@ -49,11 +46,11 @@
 	\section1 Player Controls
 
 	As the first major step, we will start with the player controller, to get at least something
-	moving on the screen. But before we dive into coding a player control, we need to prepare our
-	scene.
+	moving on the screen. But before we dive into coding a player controller, we need to prepare
+	our scene.
 
-	Firstly our player is an entity, and to be able to work with entities, our scene needs an entity
-	manager. So we add one:
+	Firstly, our player is an entity and to be able to work with entities our scene needs an entity
+	manager:
 
 	\code
 	// This `Item` serves as a container for all entities. Any entities created during the game,
@@ -115,7 +112,8 @@
 	}
 	\endqml
 
-	Now lets move onto player controls. Out will rely on physics, that means we first need to setup a \c{PhysicsWorld}:
+	Now lets move onto player controls. The player will rely on physics, that means we first need to
+	setup a \c{PhysicsWorld}:
 
 	\qml
 	Scene {
@@ -139,8 +137,9 @@
 	}
 	\endqml
 
-	Now that we have the \c{PhysicsWorld}, we can add a collider to our player. We will also make
-	our player sprite a child of the collider. The resulting player code looks like this:
+	Now that we have the \c{PhysicsWorld}, we can add a collider to our player, to turn it into a
+	physics object. We will also make our player sprite a child of the collider. The resulting
+	player code looks like this:
 
 	\qml
 	CircleCollider {
@@ -163,7 +162,7 @@
 	The final step before player is able to move around the scene, is the actual keyboard controls.
 	Here we will use a \c{TwoAxisController} with our 4 movement directions mapped to WASD keys.
 
-	\c{TwoAxisController} has two property we are interested in: \c{xAxis} and \c{yAxis}.
+	\c{TwoAxisController} has two properties we are interested in: \c{xAxis} and \c{yAxis}.
 
 	We can use them to provide a velocity vector for the \c{CircleCollider} like this:
 
@@ -177,8 +176,8 @@
 	currently pressed and update that state on each press/release together with manually updating
 	\c{xAxis} and \c{yAxis} properties of the controller.
 
-	Add the \c{bool} properties, corresponding each of the movement directions, at the start of the
-	\c{Player} entity:
+	Add the \c{bool} properties, corresponding to each of the movement directions, at the start of
+	the \c{Player} entity:
 
 	\code
 	property bool isMovingLeft
@@ -187,7 +186,7 @@
 	property bool isMovingDown
 	\endcode
 
-	Out \c{TwoAxisController} we will lok like this:
+	Our \c{TwoAxisController} we will lok like this:
 
 	\qml
 	TwoAxisController {
@@ -269,16 +268,16 @@
 	}
 	\endcode
 
-	One more final touch. We can set the \c{mirror} property of the \c{Image} to be computed based
-	on the horiontal speed, so the player sprite gets mirrored when the player moves left.
+	One final touch. We can set the \c{mirror} property of the \c{Image} to be computed based
+	on the horizontal speed, so the player sprite gets mirrored when the player moves left.
 
 	\code
 	mirror: collider.linearVelocity.x < 0
 	\endcode
 
 	For the whole player controller to work, we also need to forward all of the key events from the
-	scene to our \c{TwoAxisController}. For that we will first need expose the \c{TwoAxisController}
-	inside the player to an outside world, by creating an \c{alias property}:
+	scene to our \c{TwoAxisController}. For that we will first need to expose the
+	\c{TwoAxisController} inside the player to an outside world, by creating an \c{alias property}:
 
 	\code
 	EntityBase {
@@ -311,12 +310,11 @@
 
 	\section1 Level
 
-	Now that we have a moving player, we can add level for the player to move around. Here we will
-	with a rather simple design, the whole level wil be a square-shaped arena.
+	Now that we have a moving player, we can add a level for the player to move around. Here we will
+	go with a rather simple design, the whole level will be a square-shaped arena and it will be its
+	own entity. The level background is built out of tiles from the asset pack.
 
-	The whole level will be its own entity and is built out of tiles from the asset pack.
-
-	The code for it rather straightforward:
+	The code for it is also rather straightforward:
 
 	\qml
 	import QtQuick
@@ -411,7 +409,7 @@
 	}
 	\endqml
 
-	And now, were done with the level part and can move onto other parts of the game.
+	And now, we are done with the level part and can move onto other parts of the game.
 
 	\section1 Bullets and Shooting
 	

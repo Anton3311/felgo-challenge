@@ -34,11 +34,10 @@
 <div class="descr" id="details">
 <h2 id="introduction">Introduction</h2>
 <p>This tutorial describes how to create a simple 2D Bullet Hell Game using Felgo.</p>
-<p>The tutorial will provide a base for the overall game, enabling anyone to further expand on it. Here we will go in details on how to implement the player controls and shooting mechanics, enemies, their state machines and attack patterns, wave spawning and scene management.</p>
+<p>The tutorial will provide a base for the overall game, enabling anyone to further expand on it. Here we will go in details on how to implement the player controls and shooting mechanics, enemies, their state machines and attack patterns.</p>
 <p>The source code for the finished project is available on <a href="https://github.com/Anton3311/felgo-challenge">GitHub</a></p>
 <h2 id="assets">Assets</h2>
 <p>The art assets used throughout this tutorial are from Kenney and are available <a href="https://kenney.nl/assets/tiny-dungeon">here</a> under CC0 1.0 License. This asset pack doesn't cover all of the needed art, thus some of the missing pieces were hand-drawn in the same style. All of the used art assets are available in GitHub Repository under <a href="https://github.com/Anton3311/felgo-challenge/tree/main/assets/entities">assets/entities</a></p>
-<p>The pixel font used in the game is available on <a href="https://fonts.google.com/specimen/Jersey+10?query=Jersey+10&preview.script=Latn">Google Fonts</a></p>
 <h2 id="project-setup">Project Setup</h2>
 <p>Start by creating a new <b>Felgo Games</b> project in Qt Creator. Sepcifically we will need <b>New - Empty Felgo Project</b> template. The created project will already contain some example code in the <code translate="no">Main.qml</code>, which we will reduce down to these 15 lines:</p>
 <pre class="qml" translate="no">import Felgo 4.0
@@ -55,8 +54,8 @@ import QtQuick 2.0
         }
 }</pre>
 <h2 id="player-controls">Player Controls</h2>
-<p>As the first major step, we will start with the player controller, to get at least something moving on the screen. But before we dive into coding a player control, we need to prepare our scene.</p>
-<p>Firstly our player is an entity, and to be able to work with entities, our scene needs an entity manager. So we add one:</p>
+<p>As the first major step, we will start with the player controller, to get at least something moving on the screen. But before we dive into coding a player controller, we need to prepare our scene.</p>
+<p>Firstly, our player is an entity and to be able to work with entities our scene needs an entity manager:</p>
 <pre class="cpp" translate="no"><span class="comment">// This `Item` serves as a container for all entities. Any entities created during the game,</span>
 <span class="comment">// will be added to this container.</span>
 Item {
@@ -103,7 +102,7 @@ import <span class="string">&quot;./entities&quot;</span></pre>
 
         <span class="type">Player</span> {}
 }</pre>
-<p>Now lets move onto player controls. Out will rely on physics, that means we first need to setup a <code translate="no">PhysicsWorld</code>:</p>
+<p>Now lets move onto player controls. The player will rely on physics, that means we first need to setup a <code translate="no">PhysicsWorld</code>:</p>
 <pre class="qml" translate="no"><span class="type">Scene</span> {
         <span class="name">id</span>: <span class="name">scene</span>
 
@@ -123,7 +122,7 @@ import <span class="string">&quot;./entities&quot;</span></pre>
 
         <span class="type">Player</span> {}
 }</pre>
-<p>Now that we have the <code translate="no">PhysicsWorld</code>, we can add a collider to our player. We will also make our player sprite a child of the collider. The resulting player code looks like this:</p>
+<p>Now that we have the <code translate="no">PhysicsWorld</code>, we can add a collider to our player, to turn it into a physics object. We will also make our player sprite a child of the collider. The resulting player code looks like this:</p>
 <pre class="qml" translate="no"><span class="type">CircleCollider</span> {
         <span class="name">id</span>: <span class="name">collider</span>
         <span class="name">radius</span>: <span class="number">16</span>
@@ -140,16 +139,16 @@ import <span class="string">&quot;./entities&quot;</span></pre>
         }
 }</pre>
 <p>The final step before player is able to move around the scene, is the actual keyboard controls. Here we will use a <code translate="no">TwoAxisController</code> with our 4 movement directions mapped to WASD keys.</p>
-<p><code translate="no">TwoAxisController</code> has two property we are interested in: <code translate="no">xAxis</code> and <code translate="no">yAxis</code>.</p>
+<p><code translate="no">TwoAxisController</code> has two properties we are interested in: <code translate="no">xAxis</code> and <code translate="no">yAxis</code>.</p>
 <p>We can use them to provide a velocity vector for the <code translate="no">CircleCollider</code> like this:</p>
 <pre class="cpp" translate="no">linearVelocity: <span class="type">Qt</span><span class="operator">.</span>point(axisController<span class="operator">.</span>xAxis<span class="operator">,</span> axisController<span class="operator">.</span>yAxis)</pre>
 <p><code translate="no">TwoAxisController</code> is only able to notify us about, whenever a button gets pressed or release. However, we want to be able to presss and hold a button to move in a desired direction. This requires a bit more bookkeeping. We will need to keep track of which of the 4-direction keys are currently pressed and update that state on each press/release together with manually updating <code translate="no">xAxis</code> and <code translate="no">yAxis</code> properties of the controller.</p>
-<p>Add the <code translate="no">bool</code> properties, corresponding each of the movement directions, at the start of the <code translate="no">Player</code> entity:</p>
+<p>Add the <code translate="no">bool</code> properties, corresponding to each of the movement directions, at the start of the <code translate="no">Player</code> entity:</p>
 <pre class="cpp" translate="no">property <span class="type">bool</span> isMovingLeft
 property <span class="type">bool</span> isMovingRight
 property <span class="type">bool</span> isMovingUp
 property <span class="type">bool</span> isMovingDown</pre>
-<p>Out <code translate="no">TwoAxisController</code> we will lok like this:</p>
+<p>Our <code translate="no">TwoAxisController</code> we will lok like this:</p>
 <pre class="qml" translate="no"><span class="type">TwoAxisController</span> {
         <span class="name">id</span>: <span class="name">axisController</span>
         <span class="name">onInputActionPressed</span>: (<span class="keyword"></span>actionName) =&gt; {
@@ -219,9 +218,9 @@ function updateMovementAxis() {
                 axisController<span class="operator">.</span>yAxis <span class="operator">=</span> dy <span class="operator">*</span> deltaScale;
         }
 }</pre>
-<p>One more final touch. We can set the <code translate="no">mirror</code> property of the <code translate="no">Image</code> to be computed based on the horiontal speed, so the player sprite gets mirrored when the player moves left.</p>
+<p>One final touch. We can set the <code translate="no">mirror</code> property of the <code translate="no">Image</code> to be computed based on the horizontal speed, so the player sprite gets mirrored when the player moves left.</p>
 <pre class="cpp" translate="no">mirror: collider<span class="operator">.</span>linearVelocity<span class="operator">.</span>x <span class="operator">&lt;</span> <span class="number">0</span></pre>
-<p>For the whole player controller to work, we also need to forward all of the key events from the scene to our <code translate="no">TwoAxisController</code>. For that we will first need expose the <code translate="no">TwoAxisController</code> inside the player to an outside world, by creating an <code translate="no">alias property</code>:</p>
+<p>For the whole player controller to work, we also need to forward all of the key events from the scene to our <code translate="no">TwoAxisController</code>. For that we will first need to expose the <code translate="no">TwoAxisController</code> inside the player to an outside world, by creating an <code translate="no">alias property</code>:</p>
 <pre class="cpp" translate="no">EntityBase {
         id: player
         entityId: <span class="string">&quot;entity&quot;</span>
@@ -244,9 +243,8 @@ Player {
 }</pre>
 <p>At this point the player should be able to move around the screen.</p>
 <h2 id="level">Level</h2>
-<p>Now that we have a moving player, we can add level for the player to move around. Here we will with a rather simple design, the whole level wil be a square-shaped arena.</p>
-<p>The whole level will be its own entity and is built out of tiles from the asset pack.</p>
-<p>The code for it rather straightforward:</p>
+<p>Now that we have a moving player, we can add a level for the player to move around. Here we will go with a rather simple design, the whole level will be a square-shaped arena and it will be its own entity. The level background is built out of tiles from the asset pack.</p>
+<p>The code for it is also rather straightforward:</p>
 <pre class="qml" translate="no">import QtQuick
 import Felgo
 
@@ -323,7 +321,7 @@ import Felgo
         <span class="name">x</span>: <span class="name">levelWalls</span>.<span class="name">x</span> <span class="operator">+</span> <span class="name">levelBackground</span>.<span class="name">levelSize</span> <span class="operator">/</span> <span class="number">2</span>
         <span class="name">y</span>: <span class="name">levelWalls</span>.<span class="name">y</span> <span class="operator">+</span> <span class="name">levelBackground</span>.<span class="name">levelSize</span> <span class="operator">/</span> <span class="number">4</span> <span class="operator">*</span> <span class="number">3</span>
 }</pre>
-<p>And now, were done with the level part and can move onto other parts of the game.</p>
+<p>And now, we are done with the level part and can move onto other parts of the game.</p>
 <h2 id="bullets-and-shooting">Bullets and Shooting</h2>
 <p>Now the fun part. Here we will finaly start adding bullets, because a bullet hell game without the bullets and bullet patterns isn't a bullet hell.</p>
 <p>In this part, we will design reusable components for us to later be able to implement different bullet patterns for the enemies. For example, some of the patterns, we will have at the end look like this:</p>
