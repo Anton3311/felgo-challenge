@@ -451,7 +451,7 @@ import Felgo
 <p>Also don't forget to add <code translate="no">import &quot;../components&quot;</code> in the <code translate="no">Player.qml</code> and <code translate="no">import &quot;./components&quot;</code> in the scene file.</p>
 <p>Now if you try running the game, you will see that ... nothing has changed. However, we are already a step closer to making the player shoot bullets.</p>
 <h4 id="shooting-bullets">Shooting Bullets</h4>
-<p>To shoot the player will have to press and hold the <code translate="no">Left Mouse Button</code>. To handle this, we will need to add a <code translate="no">MouseArea</code> to our scene:</p>
+<p>To shoot, the player will have to press and hold the <code translate="no">Left Mouse Button</code>. To handle this, we will need to add a <code translate="no">MouseArea</code> to our scene:</p>
 <pre class="qml" translate="no"><span class="type">MouseArea</span> {
         <span class="name">id</span>: <span class="name">mouseArea</span>
         <span class="name">enabled</span>: <span class="number">true</span>
@@ -524,7 +524,7 @@ import &quot;../components&quot;
 
         <span class="comment">// ...</span>
 }</pre>
-<p>And finally we add a <code translate="no">shoot</code> function to the <code translate="no">Player</code> entity. Here we first calculate the direction, which is vector from the player position to the position of the crosshair (which is at the mouse cursor). After we've got the direction, we normalize it, scale it by the impulse constant and finally use the <code translate="no">createEntityFromUrlWithProperties</code> method of the <code translate="no">entityManager</code> to create an entity while passing the initial values for the properties we are interested in.</p>
+<p>And finally we add a <code translate="no">shoot</code> function to the <code translate="no">Player</code> entity. Here we first calculate the direction, which is a vector from the player position to the position of the crosshair (which is at the mouse cursor). After we've got the direction, we normalize it, scale it by the impulse constant and finally use the <code translate="no">createEntityFromUrlWithProperties</code> method of the <code translate="no">entityManager</code> to create a bullet entity while passing the initial values for the properties we are interested in.</p>
 <p><b>Note that when creating a new bullet we pass the same <code translate="no">team</code> the player has, to the bullet.</b></p>
 <pre class="qml" translate="no"><span class="type">Player</span> {
         <span class="name">id</span>: <span class="name">player</span>
@@ -596,7 +596,7 @@ import &quot;../components&quot;
                 <span class="comment">// ...</span>
         }
 }</pre>
-<p>And in the <code translate="no">mouseArea</code> signal handlers we will call the new <code translate="no">startShooting</code> and <code translate="no">stopShooting</code> functions:</p>
+<p>Back in the <code translate="no">mouseArea</code> signal handlers we will call the new <code translate="no">startShooting</code> and <code translate="no">stopShooting</code> functions:</p>
 <pre class="qml" translate="no"><span class="type">MouseArea</span> {
         <span class="comment">// ...</span>
         <span class="name">onPressed</span>: (<span class="keyword"></span>event) =&gt; {

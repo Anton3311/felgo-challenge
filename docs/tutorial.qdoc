@@ -590,7 +590,7 @@
 
 	\section3 Shooting Bullets
 
-	To shoot the player will have to press and hold the \c{Left Mouse Button}. To handle this, we
+	To shoot, the player will have to press and hold the \c{Left Mouse Button}. To handle this, we
 	will need to add a \c{MouseArea} to our scene:
 
 	\qml
@@ -690,11 +690,11 @@
 	\endqml
 
 	And finally we add a \c{shoot} function to the \c{Player} entity. Here we first calculate the
-	direction, which is vector from the player position to the position of the crosshair (which is
+	direction, which is a vector from the player position to the position of the crosshair (which is
 	at the mouse cursor). After we've got the direction, we normalize it, scale it by the impulse
 	constant and finally use the \c{createEntityFromUrlWithProperties} method of the
-	\c{entityManager} to create an entity while passing the initial values for the properties we are
-	interested in.
+	\c{entityManager} to create a bullet entity while passing the initial values for the properties
+	we are interested in.
 
 	\b{Note that when creating a new bullet we pass the same \c{team} the player has, to the bullet.}
 
@@ -786,7 +786,7 @@
 	}
 	\endqml
 
-	And in the \c{mouseArea} signal handlers we will call the new \c{startShooting} and
+	Back in the \c{mouseArea} signal handlers we will call the new \c{startShooting} and
 	\c{stopShooting} functions:
 
 	\qml
