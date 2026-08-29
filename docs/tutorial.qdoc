@@ -441,7 +441,7 @@
 			radius: bullet.radius
 			bodyType: Body.Dynamic
 			groupIndex: -1 // make sure that bullets never collide with each other
-			linearDamping: 0.1 // make the bullet slow down overtime
+			linearDamping: 0.1 // make the bullet slows down overtime
 			fixedRotation: true
 			fixture.onBeginContact: (other, normal) => {
 				// On collision with anything - destroy
@@ -478,11 +478,11 @@
 
 	This component will be called \c{Team}.
 
-	The idea here, is for example the player and its bullet will belong to the same team and entites
-	on the same team will completely ignore each other (they won't collide, they won't apply
+	The idea here is simple. For example, the player and its bullet will belong to the same team and
+	entites on the same team will completely ignore each other (they won't collide, they won't apply
 	damage).
 
-	The code for it looks like this:
+	The code for it looks like this (it is just a bunch of properties):
 
 	\qml
 	Item {
@@ -548,7 +548,7 @@
 	}
 	\endqml
 
-	Now we will need to go update the player collider, like this:
+	Now we will need to go and update the player collider, like this:
 	\qml
 	EntityBase {
 		// ...
@@ -582,7 +582,7 @@
 	}
 	\endqml
 
-	Also don't forget to and the \c{import "../components"} in the \c{Player.qml} and
+	Also don't forget to add \c{import "../components"} in the \c{Player.qml} and
 	\c{import "./components"} in the scene file.
 
 	Now if you try running the game, you will see that ... nothing has changed. However, we are

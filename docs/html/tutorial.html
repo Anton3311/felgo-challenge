@@ -324,7 +324,7 @@ import Felgo
 <p>And now, we are done with the level part and can move onto other parts of the game.</p>
 <h2 id="bullets-and-shooting">Bullets and Shooting</h2>
 <p>Now the fun part. Here we will finaly start adding bullets, because a bullet hell game without the bullets and bullet patterns isn't a bullet hell.</p>
-<p>In this part, we will design reusable components for us to later be able to implement different bullet patterns for the enemies. For example, some of the patterns, we will have at the end look like this:</p>
+<p>In this part, we will design reusable components for us to later be able to implement different bullet patterns for the enemies. For example, some of the patterns we will have at the end look like this:</p>
 <p class="centerAlign"><img src="images/ghostAttack1.png" alt="{Bullet Pattern Example 1}" /></p><p class="centerAlign"><img src="images/ghostAttack2.png" alt="{Bullet Pattern Example 2}" /></p><p>First we will start by creating a new entity. A <code translate="no">Bullet</code>:</p>
 <pre class="qml" translate="no">import QtQuick
 import Felgo
@@ -342,7 +342,7 @@ import Felgo
                 <span class="name">radius</span>: <span class="name">bullet</span>.<span class="name">radius</span>
                 <span class="name">bodyType</span>: <span class="name">Body</span>.<span class="name">Dynamic</span>
                 <span class="name">groupIndex</span>: -<span class="number">1</span> <span class="comment">// make sure that bullets never collide with each other</span>
-                <span class="name">linearDamping</span>: <span class="number">0.1</span> <span class="comment">// make the bullet slow down overtime</span>
+                <span class="name">linearDamping</span>: <span class="number">0.1</span> <span class="comment">// make the bullet slows down overtime</span>
                 <span class="name">fixedRotation</span>: <span class="number">true</span>
                 <span class="name">fixture</span>.onBeginContact: (<span class="keyword"></span>other, normal) =&gt; {
                         <span class="comment">// On collision with anything - destroy</span>
@@ -367,8 +367,8 @@ import Felgo
 <p>That means the bullet also has to act differently, based on which entity created it. For example, if the bullet was created by the player, we want it to only collide with the walls and the enemies. If the player were to somehow shoot themselfs, the bullet should simply ignore the player. The same is for the enemies.</p>
 <p>To solve this, we will introduce our first component. This won't be an <code translate="no">EntityBase</code>, rather a simple <code translate="no">Item</code> and it will live in the <code translate="no">qml/components/</code> directory.</p>
 <p>This component will be called <code translate="no">Team</code>.</p>
-<p>The idea here, is for example the player and its bullet will belong to the same team and entites on the same team will completely ignore each other (they won't collide, they won't apply damage).</p>
-<p>The code for it looks like this:</p>
+<p>The idea here is simple. For example, the player and its bullet will belong to the same team and entites on the same team will completely ignore each other (they won't collide, they won't apply damage).</p>
+<p>The code for it looks like this (it is just a bunch of properties):</p>
 <pre class="qml" translate="no"><span class="type">Item</span> {
         <span class="comment">// The name of the team, only needed in case of debugging</span>
         property <span class="type">string</span> <span class="name">debugName</span>
@@ -421,7 +421,7 @@ import Felgo
         <span class="comment">// that created them</span>
         <span class="name">bulletCollisionCategories</span>: <span class="name">levelBackground</span>.<span class="name">wallCategory</span> <span class="operator">|</span> <span class="name">Fixture</span>.<span class="name">Category2</span>
 }</pre>
-<p>Now we will need to go update the player collider, like this:</p>
+<p>Now we will need to go and update the player collider, like this:</p>
 <pre class="qml" translate="no"><span class="type">EntityBase</span> {
         <span class="comment">// ...</span>
 
@@ -448,7 +448,7 @@ import Felgo
         <span class="name">team</span>: <span class="name">playerTeam</span>
         <span class="comment">// ...</span>
 }</pre>
-<p>Also don't forget to and the <code translate="no">import &quot;../components&quot;</code> in the <code translate="no">Player.qml</code> and <code translate="no">import &quot;./components&quot;</code> in the scene file.</p>
+<p>Also don't forget to add <code translate="no">import &quot;../components&quot;</code> in the <code translate="no">Player.qml</code> and <code translate="no">import &quot;./components&quot;</code> in the scene file.</p>
 <p>Now if you try running the game, you will see that ... nothing has changed. However, we are already a step closer to making the player shoot bullets.</p>
 <h4 id="shooting-bullets">Shooting Bullets</h4>
 <p>To shoot the player will have to press and hold the <code translate="no">Left Mouse Button</code>. To handle this, we will need to add a <code translate="no">MouseArea</code> to our scene:</p>
