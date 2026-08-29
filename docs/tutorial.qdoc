@@ -23,7 +23,7 @@
 
 	\section1 Project Setup
 
-	Start by creating a new \b{Felgo Games} project in Qt Creator. Sepcifically we will need
+	Start by creating a new \b{Felgo Games} project in Qt Creator. Specifically we will need
 	\b{New - Empty Felgo Project} template. The created project will already contain some example
 	code in the \c{Main.qml}, which we will reduce down to these 15 lines:
 
@@ -98,7 +98,7 @@
 	import "./entities"
 	\endcode
 
-	Finally add our \c{Player} right after the \c{EntityManager}, like this:
+	Finally, add our \c{Player} right after the \c{EntityManager}, like this:
 	\qml
 	Scene {
 		id: scene
@@ -112,8 +112,8 @@
 	}
 	\endqml
 
-	Now lets move onto player controls. The player will rely on physics, that means we first need to
-	setup a \c{PhysicsWorld}:
+	Now lets move on to player controls. The player will rely on physics, that means we first need
+	to setup a \c{PhysicsWorld}:
 
 	\qml
 	Scene {
@@ -170,11 +170,11 @@
 	linearVelocity: Qt.point(axisController.xAxis, axisController.yAxis)
 	\endcode
 
-	\c{TwoAxisController} is only able to notify us about, whenever a button gets pressed or release.
-	However, we want to be able to presss and hold a button to move in a desired direction. This
-	requires a bit more bookkeeping. We will need to keep track of which of the 4-direction keys are
-	currently pressed and update that state on each press/release together with manually updating
-	\c{xAxis} and \c{yAxis} properties of the controller.
+	\c{TwoAxisController} is only able to notify us about, whenever a button gets pressed or
+	released. However, we want to be able to press and hold a button to move in a desired direction.
+	This requires a bit more bookkeeping. We will need to keep track of which of the 4-direction
+	keys are currently pressed and update that state on each press/release together with manually
+	updating \c{xAxis} and \c{yAxis} properties of the controller.
 
 	Add the \c{bool} properties, corresponding to each of the movement directions, at the start of
 	the \c{Player} entity:
@@ -382,7 +382,7 @@
 	}
 	\endqml
 
-	The colliders here a placed to match where the walls are in the background sprite. If you set
+	The colliders here are placed to match where the walls in the background sprite are. If you set
 	\c{debugDrawVisible} to \c{true} in the \c{PhysicsWorld} you will see the next picture:
 
 	\image {levelColliders.png} {Level Colliders}
@@ -409,7 +409,7 @@
 	}
 	\endqml
 
-	And now, we are done with the level part and can move onto other parts of the game.
+	And now, we are done with the level part and can move on to other parts of the game.
 
 	\section1 Bullets and Shooting
 	
@@ -470,7 +470,7 @@
 
 	That means the bullet also has to act differently, based on which entity created it. For
 	example, if the bullet was created by the player, we want it to only collide with the walls and
-	the enemies. If the player were to somehow shoot themselfs, the bullet should simply ignore the
+	the enemies. If the player were to somehow shoot themselves, the bullet should simply ignore the
 	player. The same is for the enemies.
 
 	To solve this, we will introduce our first component. This won't be an \c{EntityBase}, rather a
@@ -647,7 +647,7 @@
 	}
 	\endqml
 
-	And assing it in the scene:
+	And assign it in the scene:
 
 	\qml
 	Player {
@@ -733,7 +733,7 @@
 	}
 	\endqml
 
-	To quickly test how everything works we can temporaly call \c{shoot} whenever we get the
+	To quickly test how everything works we can temporarily call \c{shoot} whenever we get the
 	\c{pressed} signal in the \c{mouseArea}:
 
 	\qml
@@ -752,10 +752,10 @@
 	Right now \c{shoot} will only be called when the butten gets pressed, so you will need to press
 	it multiple times to shoot many bullets.
 
-	Now that we've verify that it works, we can finish this features. The goal was to able to press
-	and hold to shoot bullets continuosly. For that we will add a \c{Timer} to our player. The timer 
-	will periodically call the \c{shoot} function. And we will control it (enable or disable)
-	whenever we get \c{pressed} or \c{released} signals from the \c{mouseArea}.
+	Now that we've verified that it works, we can finish this features. The goal was to be able to
+	press and hold to shoot bullets continuously. For that we will add a \c{Timer} to our player.
+	The timer  will periodically call the \c{shoot} function. And we will control it (enable or
+	disable) whenever we get \c{pressed} or \c{released} signals from the \c{mouseArea}.
 
 	\qml
 	Player {
@@ -811,7 +811,7 @@
 	reperesanted/handled by the \c{Damagable} component.
 
 	This a rather simple component and doesn't require much code. It will have a single function
-	for appling damage, and a couple of signals to notify the outside world:
+	for appling damage and a couple of signals to notify the outside world:
 
 	\qml
 	import QtQuick
@@ -1056,7 +1056,7 @@
 	\section1 Enemies
 
 	Now we've reached the last major part of this tutorial and the game: the enemies. In the next
-	sections we won't go into as much of details as in the previos ones, since we already have the
+	sections we won't go into as much of details as in the previous ones, since we already have the
 	majority of building blocks in place, and right now we will mostly need to assemble them.
 
 	As a part of this tutorial we will create a single enemy, which will be a ghost.
@@ -1071,7 +1071,7 @@
 	\c{Player}, specifically: \c{Damagable}, \c{CircleCollider} and \c{BulletEmitter} (which will
 	come in handy later).
 
-	After taking parts of the player and appling some minor modifications like changing the
+	After taking parts of the player and applying some minor modifications like changing the
 	\c{maxHealth} and the \c{sprite}, and handling \c{death} signal of the \c{Damagable}, we end up
 	with something like this:
 	
@@ -1139,7 +1139,7 @@
 	}
 	\endqml
 
-	Now if you were to launch the game and test the enemy, you will notice that the enemy doesn't
+	Now if you were to launch the game and test the enemy, you would notice that the enemy doesn't
 	seem to recieve any damage and moreover seems to be immortal. The reason for that is rather
 	simple: we forgot to implement one tiny but crucial feature of the \c{Bullet}. Right now when a
 	bullet hits an entity it doesn't apply any damage. It simply destroys itself.
@@ -1194,8 +1194,8 @@
 	This doesn't require much. We just need a single timer, that will periodically fire (for example,
 	every 1.2 seconds) and trigger the attack pattern.
 
-	There is also one problem we quickly need to take care of. We don't know where the player is the
-	world. To be able to shoot bullets in the direction of the player, we need to know the exact
+	There is also one problem we quickly need to take care of. We don't know where the player in the
+	world is. To be able to shoot bullets in the direction of the player, we need to know the exact
 	position.
 
 	\b{Although we don't necessarily need the reference to the \c{target} right now for this attack
@@ -1208,7 +1208,7 @@
 	means, all the possible options for which entity could be a target, boil down to just the
 	player. That said, we can simply pass the player instance from scene down to each enemy.
 
-	That is what the \c{target} property in the \c{Ghost.qml} for.
+	That what the \c{target} property in the \c{Ghost.qml} is for.
 
 	\qml
 	EntityBase {
@@ -1243,7 +1243,7 @@
 	one, which involes shooting some number of bullets in all directions. Let's say that number is
 	12 bullets and they will be evenly spaced across the circumference of the circle.
 
-	The math for this dead simple:
+	The math for this is dead simple:
 
 	\qml
 	Timer {
@@ -1269,14 +1269,14 @@
 
 	\image {ghostAttack1.png} {Ghost Attack}
 
-	This was pretty neat, however I want give an example of a more sofisticated attack pattern. This
-	attack pattern involves shooting bullets directly towards the player, while applying some
+	This was pretty neat, however I want to give an example of a more sofisticated attack pattern.
+	This attack pattern involves shooting bullets directly towards the player, while applying some
 	variation in direction and creating bullets one by one with some time in between.
 
 	This pattern is already at the limits of what the current \c{BulletEmitter} allows. It allows us
 	to immediately create bullets. However, we want quite the opposite. We could add another timer
 	to the \c{Ghost} enemy, that delays the creation of bullets, but it would complicate things.
-	Furthermore we want to keep it reusable so that other pattern implementation could benefit from
+	Furthermore, we want to keep it reusable so that other pattern implementation could benefit from
 	it.
 
 	The idea here is to introduce a queue and a \c{Timer} in the \c{BulletEmitter}. The timer will
@@ -1366,8 +1366,8 @@
 	\endqml
 
 	Our new attack pattern is done. Although, we had to get rid of the first one, we can still use
-	in a different place. For example, whenever the enemy dies. This shouldn't be that difficult to
-	implement. We only have to move the pattern code to the \c{death} signal handler, where we
+	it in a different place. For example, whenever the enemy dies, this shouldn't be that difficult
+	to implement. We only have to move the pattern code to the \c{death} signal handler, where we
 	already have \c{self.destroy()}.
 
 	\qml
@@ -1401,7 +1401,7 @@
 	now the enemy, besides the attacks, doesn't do much. The AI will be a state machine with only 2
 	states: attacking and following. In terms of the attack state, there isn't much, as we've
 	already implemented it and will only need to port it to work with the state machine. That means,
-	we are left with implementing the state mchine and the \c{following} state.
+	we are left with implementing the state machine and the \c{following} state.
 
 	The \c{following} state isn't complicated either, it simply involves moving the enemy towards 
 	the player, until it is in range. When in range we switch the enemy into the \c{attacking}
@@ -1521,7 +1521,7 @@
 	\endlist
 
 	But with the current foundation it should be much easier to expand the game further. As an
-	example, use can checkout the
+	example, you can checkout the
 	\l {https://github.com/Anton3311/felgo-challenge} {GitHub repository}.
 	It contains a more complete version of the game, then the one described in this tutorial.
 */
