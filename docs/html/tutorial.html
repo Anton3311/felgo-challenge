@@ -54,7 +54,7 @@ import QtQuick 2.0
         }
 }</pre>
 <h2 id="player-controls">Player Controls</h2>
-<p>As the first major step, we will start with the player controller, to get at least something moving on the screen. But before we dive into coding a player control, we need to prepare out scene.</p>
+<p>As the first major step, we will start with the player controller, to get at least something moving on the screen. But before we dive into coding a player control, we need to prepare our scene.</p>
 <p>Firstly our player is an entity, and to be able to work with entities, our scene needs an entity manager. So we add one:</p>
 <pre class="cpp" translate="no"><span class="comment">// This `Item` serves as a container for all entities. Any entities created during the game,</span>
 <span class="comment">// will be added to this container.</span>
@@ -905,7 +905,61 @@ import &quot;../components&quot;
 }</pre>
 <p>Now we can launch the game and verify that the enemy is indeed no longer immortal.</p>
 <h4 id="making-enemies-shoot">Making Enemies shoot</h4>
-<h4 id="enemy-state-machine">Enemy State Machine</h4>
+<p>After creating a base for our enemy, we can start implement its attacks. For now we will keep it simple, and make it periodically shoot bullets. This is where we will need the <code translate="no">BulletEmitter</code>.</p>
+<p>This doesn't require much. We just need a single timer, that will periodically fire (every 1.2 seconds) and trigger the attack pattern.</p>
+<p>There is also one problem we quickly need to take care of. We don't know where the player is the world. To be able to shoot bullets in the direction of the player, we need to know the exact position.</p>
+<p>At this point, there are many options to handle this. For example, we could use colliders to check whenever a potential target is in range. However, we will go with a way simpler solution. In our case the only entity on the player's team is the player, there are no other players. That means, all the possible options for which entity could be a target, boil down to just the player. That said, we can simply pass the player instance from scene down to each enemy.</p>
+<p>That is what the <code translate="no">target</code> property in the <code translate="no">Ghost.qml</code> for.</p>
+<pre class="qml" translate="no"><span class="type">EntityBase</span> {
+        <span class="comment">// ...</span>
+
+        property <span class="type">EntityBase</span> <span class="name">target</span>
+
+        <span class="comment">// ...</span>
+
+        <span class="type">Timer</span> {
+                <span class="name">id</span>: <span class="name">attackTimer</span>
+                <span class="name">interval</span>: <span class="number">1.2</span> <span class="operator">*</span> <span class="number">1000</span>
+                <span class="name">repeat</span>: <span class="number">true</span>
+                <span class="name">running</span>: <span class="number">true</span>
+                <span class="name">onTriggered</span>: {
+                        <span class="keyword">if</span> (<span class="name">target</span> <span class="operator">===</span> <span class="number">null</span>) {
+                                <span class="keyword">return</span>;
+                        }
+
+                        <span class="comment">// attack pattern goes here</span>
+                }
+        }
+}</pre>
+<p>Back in the scene:</p>
+<pre class="qml" translate="no"><span class="type">Ghost</span> {
+        <span class="comment">// ...</span>
+        <span class="name">target</span>: <span class="name">player</span>
+}</pre>
+<p>Now we can dive into implementing the actual attack pattern. We can start with a rather simple one, which involes shooting some number of bullets in all directions. Let's say that number is 12 bullets and they will be evenly spaced across the circumference of the circle.</p>
+<p>The math for this dead simple:</p>
+<pre class="qml" translate="no"><span class="type">Timer</span> {
+        <span class="name">id</span>: <span class="name">attackTimer</span>
+        <span class="comment">// ...</span>
+        <span class="name">onTriggered</span>: {
+                <span class="keyword">if</span> (<span class="name">target</span> <span class="operator">===</span> <span class="number">null</span>) {
+                        <span class="keyword">return</span>;
+                }
+
+                let count = <span class="number">12</span>;
+                let angleStep = <span class="number">2</span> <span class="operator">*</span> <span class="name">Math</span>.<span class="name">PI</span> <span class="operator">/</span> <span class="name">count</span>
+                <span class="keyword">for</span> (let i = 0; <span class="name">i</span> <span class="operator">&lt;</span> <span class="name">count</span>; <span class="name">i</span> <span class="operator">+=</span> <span class="number">1</span>) {
+                        let angle = <span class="name">angleStep</span> <span class="operator">*</span> <span class="name">i</span>;
+
+                        let x = <span class="name">Math</span>.<span class="name">cos</span>(<span class="name">angle</span>);
+                        let y = <span class="name">Math</span>.<span class="name">sin</span>(<span class="name">angle</span>);
+
+                        <span class="name">bulletEmitter</span>.<span class="name">emit</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="name">x</span>, <span class="name">y</span>, <span class="number">150</span>);
+                }
+        }
+}</pre>
+<p>The final result looks like this (note, that on this screenshot, some of the bullets have hit the walls and disappeared):</p>
+<p class="centerAlign"><img src="images/ghostAttack1.png" alt="{Ghost Attack}" /></p><h4 id="enemy-state-machine">Enemy State Machine</h4>
 </div>
 <!-- @@@tutorial.html -->
 </body>

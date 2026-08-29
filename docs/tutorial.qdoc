@@ -49,7 +49,7 @@
 	\section1 Player Controls
 
 	As the first major step, we will start with the player controller, to get at least something
-	moving on the screen. But before we dive into coding a player control, we need to prepare out
+	moving on the screen. But before we dive into coding a player control, we need to prepare our
 	scene.
 
 	Firstly our player is an entity, and to be able to work with entities, our scene needs an entity
@@ -1188,6 +1188,92 @@
 	Now we can launch the game and verify that the enemy is indeed no longer immortal.
 
 	\section3 Making Enemies shoot
+
+	After creating a base for our enemy, we can start implement its attacks. For now we will keep it
+	simple, and make it periodically shoot bullets. This is where we will need the
+	\c{BulletEmitter}. 
+
+	This doesn't require much. We just need a single timer, that will periodically fire (every 1.2
+	seconds) and trigger the attack pattern.
+
+	There is also one problem we quickly need to take care of. We don't know where the player is the
+	world. To be able to shoot bullets in the direction of the player, we need to know the exact
+	position.
+
+	At this point, there are many options to handle this. For example, we could use colliders to
+	check whenever a potential target is in range. However, we will go with a way simpler solution.
+	In our case the only entity on the player's team is the player, there are no other players. That
+	means, all the possible options for which entity could be a target, boil down to just the
+	player. That said, we can simply pass the player instance from scene down to each enemy.
+
+	That is what the \c{target} property in the \c{Ghost.qml} for.
+
+	\qml
+	EntityBase {
+		// ...
+
+		property EntityBase target
+
+		// ...
+
+		Timer {
+			id: attackTimer
+			interval: 1.2 * 1000
+			repeat: true
+			running: true
+			onTriggered: {
+				if (target === null) {
+					return;
+				}
+
+				// attack pattern goes here
+			}
+		}
+	}
+	\endqml
+
+	Back in the scene:
+
+	\qml
+	Ghost {
+		// ...
+		target: player
+	}
+	\endqml
+
+	Now we can dive into implementing the actual attack pattern. We can start with a rather simple
+	one, which involes shooting some number of bullets in all directions. Let's say that number is
+	12 bullets and they will be evenly spaced across the circumference of the circle.
+
+	The math for this dead simple:
+
+	\qml
+	Timer {
+		id: attackTimer
+		// ...
+		onTriggered: {
+			if (target === null) {
+				return;
+			}
+
+			let count = 12;
+			let angleStep = 2 * Math.PI / count
+			for (let i = 0; i < count; i += 1) {
+				let angle = angleStep * i;
+
+				let x = Math.cos(angle);
+				let y = Math.sin(angle);
+
+				bulletEmitter.emit(0, 0, x, y, 150);
+			}
+		}
+	}
+	\endqml
+
+	The final result looks like this (note, that on this screenshot, some of the bullets have hit
+	the walls and disappeared):
+
+	\image {ghostAttack1.png} {Ghost Attack}
 
 	\section3 Enemy State Machine
 */
